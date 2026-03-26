@@ -1,4 +1,4 @@
-h<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -77,8 +77,6 @@ nav.scrolled{background:rgba(6,11,20,0.92);backdrop-filter:blur(20px);border-bot
 .hero-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden;position:relative}
 .hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--amber),var(--green));z-index:2}
 .hero-card-img{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,#0d1e35 0%,#162438 50%,#0a1624 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-
-/* ── الصورة — تم تكبيرها من 140px إلى 210px ── */
 .hero-card-img-placeholder{
   width:210px;
   height:210px;
@@ -97,7 +95,6 @@ nav.scrolled{background:rgba(6,11,20,0.92);backdrop-filter:blur(20px);border-bot
   letter-spacing:-2px;
   background:linear-gradient(135deg,var(--cyan2),#0066aa);
 }
-
 .hero-card-img-ring{position:absolute;width:240px;height:240px;border-radius:50%;border:1px dashed rgba(0,212,255,0.2);animation:spin-ring 20s linear infinite}
 .hero-card-img-ring2{position:absolute;width:290px;height:290px;border-radius:50%;border:1px dashed rgba(0,212,255,0.1);animation:spin-ring 30s linear infinite reverse}
 @keyframes spin-ring{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
@@ -173,6 +170,12 @@ section{padding:100px 5%;position:relative;z-index:1}
 .project-tech{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
 .tech-tag{font-family:var(--font-mono);font-size:0.64rem;padding:3px 8px;border-radius:3px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text3);font-weight:500}
 .project-metric{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:20px;padding:4px 12px;font-family:var(--font-mono);font-size:0.7rem;color:var(--green);font-weight:600}
+.project-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.project-link{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-family:var(--font-mono);font-size:0.68rem;font-weight:700;letter-spacing:0.3px;transition:all 0.2s}
+.project-link.primary{background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);color:var(--cyan)}
+.project-link.primary:hover{background:rgba(0,212,255,0.16);transform:translateY(-1px)}
+.project-link.ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.project-link.ghost:hover{border-color:var(--text2);color:var(--text)}
 
 #experience{background:var(--bg2)}
 .timeline{position:relative;padding-right:20px}
@@ -280,13 +283,14 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
         Mohammad <span>Taha</span>
       </h1>
       <div class="hero-title">
-        <span id="typed-title">Data Science & AI Engineer</span>
+        <span id="typed-title">Data Science & AI Engineer · LLM Engineer · Big Data Engineer</span>
         <span class="cursor-blink"></span>
       </div>
       <p class="hero-bio">
         4th-year <strong>Data Science & AI student</strong> at Philadelphia University, Amman.
-        Building end-to-end ML pipelines, big data solutions with Apache Spark,
-        and analytical dashboards. I thrive on turning raw data into decisions.
+        Building end-to-end ML pipelines, <strong>big data solutions with Apache Spark</strong>,
+        and modern AI applications using <strong>RAG, LangChain, and LangGraph</strong>.
+        I enjoy turning raw data into intelligent systems and I am still continuously developing myself to become a stronger AI engineer.
       </p>
       <div class="hero-cta">
         <a href="#projects" class="btn-primary">View Projects</a>
@@ -321,7 +325,6 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
       <div class="hero-card-img">
         <div class="hero-card-img-ring"></div>
         <div class="hero-card-img-ring2"></div>
-        <!-- ضع اسم صورتك هنا بعد ما ترفعها مع الملف -->
         <img src="WhatsApp Image 2025-09-28 at 1.17.18 PM.jpeg" alt="Mohammad Taha" class="hero-card-img-placeholder"
           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div style="display:none;width:210px;height:210px;border-radius:50%;background:linear-gradient(135deg,var(--cyan2),#0066aa);align-items:center;justify-content:center;font-family:var(--font-display);font-size:3.5rem;font-weight:800;color:#fff;position:relative;z-index:1">MT</div>
@@ -370,8 +373,8 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
     <h2 class="section-title reveal">Who I Am</h2>
     <div class="stats-row reveal">
       <div class="stat-box">
-        <div class="stat-num" data-count="3">0</div>
-        <div class="stat-label">ML Projects</div>
+        <div class="stat-num" data-count="5">0</div>
+        <div class="stat-label">AI & Data Projects</div>
       </div>
       <div class="stat-box">
         <div class="stat-num" data-count="90">0</div>
@@ -383,7 +386,7 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
       </div>
     </div>
     <p class="about-bio reveal">
-      I'm a <strong>Data Science and Artificial Intelligence</strong> student who learns quickly, adapts to new environments, and enjoys contributing through volunteering. Outside of tech, I'm a hiker — building discipline, resilience, and a growth mindset. I've worked on end-to-end data projects covering <strong>classification, regression, big data with Apache Spark</strong>, and educational analytics.
+      I'm a <strong>Data Science and Artificial Intelligence</strong> student who learns quickly, adapts to new environments, and enjoys contributing through volunteering. Outside of tech, I'm a hiker — building discipline, resilience, and a growth mindset. I've worked on end-to-end data projects covering <strong>classification, regression, big data with Apache Spark, dashboards, RAG pipelines, and AI agent systems</strong>. I am still continuously developing myself, learning modern tools and building practical projects to become the best version of myself in <strong>AI, data science, and big data engineering</strong>.
     </p>
     <div class="about-grid">
       <div class="about-card reveal reveal-delay-1">
@@ -393,9 +396,9 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
           What I'm Looking For
         </h3>
         <ul>
-          <li>Internship roles in Data Science, AI Engineering, or ML/NLP</li>
+          <li>Internship roles in Data Science, AI Engineering, LLM Engineering, or Big Data</li>
           <li>Teams that value experimentation, clean engineering, and measurable impact</li>
-          <li>Projects where I can contribute end-to-end: data, modeling, evaluation, and deployment</li>
+          <li>Projects where I can contribute end-to-end: data, modeling, evaluation, deployment, and intelligent AI workflows</li>
         </ul>
       </div>
       <div class="about-card reveal reveal-delay-2">
@@ -405,9 +408,9 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
           What You Can Expect
         </h3>
         <ul>
-          <li>Strong fundamentals: algorithms, data structures, databases, ML/DL, and NLP</li>
-          <li>Hands-on project delivery and clear communication</li>
-          <li>High ownership and reliability — especially under time constraints</li>
+          <li>Strong fundamentals in algorithms, databases, ML/DL, NLP, and big data processing</li>
+          <li>Hands-on experience building AI systems with RAG, LangChain, LangGraph, and Apache Spark</li>
+          <li>High ownership, clear communication, and continuous self-development</li>
         </ul>
       </div>
     </div>
@@ -432,23 +435,29 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
           <span class="skill-tag">JavaScript</span>
           <span class="skill-tag">HTML / CSS</span>
           <span class="skill-tag">Git & GitHub</span>
-          <span class="skill-tag">Docker (Basics)</span>
+          <span class="skill-tag">Docker</span>
+          <span class="skill-tag">Pydantic</span>
         </div>
       </div>
       <div class="skill-cat reveal reveal-delay-2">
         <div class="skill-cat-title">
           <div class="skill-cat-icon" style="background:rgba(0,229,160,0.1)">🤖</div>
-          AI & Data Science
+          AI, LLM & Big Data
         </div>
         <div class="skill-tags">
           <span class="skill-tag featured">Machine Learning</span>
           <span class="skill-tag featured">Apache Spark / PySpark</span>
           <span class="skill-tag featured">MLlib</span>
+          <span class="skill-tag featured">RAG Systems</span>
+          <span class="skill-tag featured">LangChain</span>
+          <span class="skill-tag featured">LangGraph</span>
+          <span class="skill-tag">AI Agents</span>
           <span class="skill-tag">Deep Learning</span>
-          <span class="skill-tag">NLP (Basic)</span>
+          <span class="skill-tag">NLP</span>
           <span class="skill-tag">scikit-learn</span>
           <span class="skill-tag">Pandas / NumPy</span>
           <span class="skill-tag">Feature Engineering</span>
+          <span class="skill-tag">Big Data Processing</span>
         </div>
       </div>
       <div class="skill-cat reveal reveal-delay-3">
@@ -460,6 +469,11 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
           <span class="skill-tag featured">Power BI</span>
           <span class="skill-tag">DAX</span>
           <span class="skill-tag">Power Query</span>
+          <span class="skill-tag">FastAPI</span>
+          <span class="skill-tag">Streamlit</span>
+          <span class="skill-tag">Qdrant</span>
+          <span class="skill-tag">Hugging Face</span>
+          <span class="skill-tag">Sentence Transformers</span>
           <span class="skill-tag">Jupyter / Colab</span>
           <span class="skill-tag">VS Code</span>
           <span class="skill-tag">PyCharm</span>
@@ -475,7 +489,7 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
   <div class="inner">
     <div class="section-label reveal">003 — Projects</div>
     <h2 class="section-title reveal">Selected Work</h2>
-    <p class="section-sub reveal">End-to-end projects covering ML, big data, analytics, and systems development.</p>
+    <p class="section-sub reveal">End-to-end projects covering ML, big data, analytics, and modern AI systems.</p>
     <div class="projects-grid">
       <div class="project-card reveal reveal-delay-1">
         <div class="project-header">
@@ -498,6 +512,7 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
           <div class="project-metric">✦ AUC &gt; 0.92</div>
         </div>
       </div>
+
       <div class="project-card reveal reveal-delay-2">
         <div class="project-header">
           <div class="project-icon" style="background:rgba(240,180,40,0.1);font-size:1.5rem">📊</div>
@@ -518,7 +533,63 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
           <div class="project-metric" style="background:rgba(240,180,40,0.08);border-color:rgba(240,180,40,0.25);color:var(--amber)">✦ 5+ KPI Measures</div>
         </div>
       </div>
+
       <div class="project-card reveal reveal-delay-3">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(0,180,100,0.1);font-size:1.5rem">📚</div>
+          <span class="project-badge badge-green">LLM · RAG</span>
+        </div>
+        <div class="project-name">RAG Document Question Answering System</div>
+        <div class="project-desc">Built an AI system that allows users to upload documents, retrieve the most relevant information using semantic search, and generate answers with an LLM.</div>
+        <ul class="project-bullets">
+          <li>Implemented document upload, text chunking, embeddings, and vector search workflow</li>
+          <li>Used Qdrant for semantic retrieval and Hugging Face models for intelligent answer generation</li>
+          <li>Designed a practical API and interactive interface for real-world document QA</li>
+        </ul>
+        <div class="project-tech">
+          <span class="tech-tag">Python</span><span class="tech-tag">FastAPI</span>
+          <span class="tech-tag">Qdrant</span><span class="tech-tag">Hugging Face</span>
+          <span class="tech-tag">Sentence Transformers</span><span class="tech-tag">Docker</span>
+          <span class="tech-tag">Streamlit</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <div class="project-metric" style="background:rgba(0,180,100,0.08);border-color:rgba(0,180,100,0.2);color:#00e08a">✦ RAG Pipeline</div>
+          <div class="project-metric" style="background:rgba(0,180,100,0.08);border-color:rgba(0,180,100,0.2);color:#00e08a">✦ Semantic Search</div>
+        </div>
+        <div class="project-links">
+          <a href="https://lnkd.in/di4bekHP" target="_blank" class="project-link primary">View Project ↗</a>
+          <a href="https://github.com/tahamohmadf19-dev" target="_blank" class="project-link ghost">GitHub Profile</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal reveal-delay-4">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(0,212,255,0.12);font-size:1.5rem">🤖</div>
+          <span class="project-badge badge-cyan">AI Agents · LLM</span>
+        </div>
+        <div class="project-name">AI Agent Router</div>
+        <div class="project-desc">Developed an AI system that classifies user intent and routes messages to specialized agents for more suitable responses instead of relying on a single chatbot.</div>
+        <ul class="project-bullets">
+          <li>Built intent-based routing logic using LangGraph and modular agent architecture</li>
+          <li>Implemented a Therapist Agent for supportive responses and a Logical Agent for direct factual answers</li>
+          <li>Improved understanding of agent workflows, orchestration, and scalable AI system design</li>
+        </ul>
+        <div class="project-tech">
+          <span class="tech-tag">Python</span><span class="tech-tag">LangChain</span>
+          <span class="tech-tag">LangGraph</span><span class="tech-tag">Claude LLM</span>
+          <span class="tech-tag">Pydantic</span><span class="tech-tag">Streamlit</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <div class="project-metric">✦ Agent Routing</div>
+          <div class="project-metric">✦ Intent Classification</div>
+        </div>
+        <div class="project-links">
+          <a href="https://lnkd.in/dGGnN7rA" target="_blank" class="project-link primary">View Project ↗</a>
+          <a href="https://github.com/tahamohmadf19-dev" target="_blank" class="project-link ghost">GitHub Profile</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal reveal-delay-1">
         <div class="project-header">
           <div class="project-icon" style="background:rgba(0,180,100,0.1);font-size:1.5rem">🗄️</div>
           <span class="project-badge badge-green">Python · Database</span>
@@ -538,7 +609,8 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
           <div class="project-metric" style="background:rgba(0,180,100,0.08);border-color:rgba(0,180,100,0.2);color:#00e08a">✦ Full CRUD</div>
         </div>
       </div>
-      <div class="project-card reveal reveal-delay-4" style="border-color:rgba(0,212,255,0.15);background:linear-gradient(135deg,var(--surface) 0%,rgba(0,212,255,0.03) 100%)">
+
+      <div class="project-card reveal reveal-delay-2" style="border-color:rgba(0,212,255,0.15);background:linear-gradient(135deg,var(--surface) 0%,rgba(0,212,255,0.03) 100%)">
         <div class="project-header">
           <div class="project-icon" style="background:rgba(0,212,255,0.12);font-size:1.5rem">🎓</div>
           <span class="project-badge badge-cyan">Graduation Project</span>
@@ -560,6 +632,7 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
         </div>
       </div>
     </div>
+
     <div style="text-align:center;margin-top:32px" class="reveal">
       <a href="https://github.com/tahamohmadf19-dev" target="_blank" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
@@ -573,7 +646,7 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
   <div class="inner">
     <div class="section-label reveal">004 — Experience</div>
     <h2 class="section-title reveal">Work & Education</h2>
-    <p class="section-sub reveal">Hands-on training and academic foundation in data science and AI.</p>
+    <p class="section-sub reveal">Hands-on training and academic foundation in data science, AI, LLM applications, and big data.</p>
     <div class="exp-grid">
       <div>
         <div class="timeline reveal">
@@ -587,6 +660,7 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
               <li>Worked with big data tools using Apache Spark for large-scale processing and MLlib models</li>
               <li>Practiced classical ML and deep learning techniques for classification and regression</li>
               <li>Built analytical dashboards using Power BI to visualize KPIs and business insights from real datasets</li>
+              <li>Expanded my practical skills through self-driven work in RAG systems, LLM applications, LangChain, and LangGraph</li>
             </ul>
           </div>
           <div class="timeline-item">
@@ -642,7 +716,7 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
   <div class="inner">
     <div class="section-label reveal">005 — Credentials</div>
     <h2 class="section-title reveal">Courses & Certifications</h2>
-    <p class="section-sub reveal">Continuous learning to stay sharp at the edge of the field.</p>
+    <p class="section-sub reveal">Continuous learning to stay sharp at the edge of data, AI, and intelligent systems.</p>
     <div class="cred-grid">
       <div class="cred-card reveal reveal-delay-1">
         <div class="cred-icon">☁️</div>
@@ -657,10 +731,10 @@ footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-ite
         <div class="cred-year">2025</div>
       </div>
       <div class="cred-card reveal reveal-delay-3">
-        <div class="cred-icon">📖</div>
-        <div class="cred-name">Storytelling & Narrative</div>
-        <div class="cred-issuer">Digital Content · Training Program</div>
-        <div class="cred-year">2025</div>
+        <div class="cred-icon">🤖</div>
+        <div class="cred-name">Applied LLM & Agent Systems</div>
+        <div class="cred-issuer">Self-Learning Journey</div>
+        <div class="cred-year">RAG · LangChain · LangGraph · 2025</div>
       </div>
       <div class="cred-card reveal reveal-delay-1">
         <div class="cred-icon">⚡</div>
@@ -762,10 +836,16 @@ function connectParticles(){for(let i=0;i<particles.length;i++){for(let j=i+1;j<
 function animate(){ctx.clearRect(0,0,W,H);particles.forEach(p=>{p.update();p.draw()});connectParticles();requestAnimationFrame(animate)}
 animate();
 
-const titles=['Data Science & AI Engineer','ML Pipeline Builder','Big Data Engineer','Power BI Analyst','Problem Solver'];
+const titles=[
+  'Data Science & AI Engineer · LLM Engineer · Big Data Engineer',
+  'RAG & LLM Applications Builder',
+  'LangChain / LangGraph Developer',
+  'Big Data Engineer',
+  'ML Pipeline Builder'
+];
 let ti=0,ci=0,deleting=false;
 const el=document.getElementById('typed-title');
-function typeWriter(){const current=titles[ti];if(!deleting){el.textContent=current.slice(0,++ci);if(ci===current.length){deleting=true;setTimeout(typeWriter,2000);return}}else{el.textContent=current.slice(0,--ci);if(ci===0){deleting=false;ti=(ti+1)%titles.length}}setTimeout(typeWriter,deleting?40:80)}
+function typeWriter(){const current=titles[ti];if(!deleting){el.textContent=current.slice(0,++ci);if(ci===current.length){deleting=true;setTimeout(typeWriter,2000);return}}else{el.textContent=current.slice(0,--ci);if(ci===0){deleting=false;ti=(ti+1)%titles.length}}setTimeout(typeWriter,deleting?30:55)}
 setTimeout(typeWriter,1000);
 
 window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50)});
