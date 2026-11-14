@@ -39,6 +39,105 @@
   },
   "projects": [
     {
+      "id": "olist-mlops",
+      "name": "Olist MLOps",
+      "shows": "MLOps and model serving",
+      "state": "Educational prototype",
+      "problem": "Predict whether an Olist e-commerce order will arrive late, and serve that prediction through a tested, monitored API instead of a notebook.",
+      "built": [
+        "A FastAPI inference service around the fitted scikit-learn model, with schema and semantic input checks.",
+        "Feature engineering shared by the training notebooks and the service, with a parity check between them.",
+        "Prometheus metrics, two alert rules and an offline score-drift check.",
+        "DVC pointers for data and model files, an MLflow registry entry, and a GitHub Actions pipeline."
+      ],
+      "works": [
+        "CI runs lint, formatting, 172 tests and a Docker build on every push.",
+        "A Kaggle notebook re-runs the pipeline from the raw Olist data and reproduces the saved test results.",
+        "The service never refits the model; it loads the saved preprocessor and classifier."
+      ],
+      "architecture": "Six notebooks prepare data and train; a FastAPI service loads the saved preprocessor and model; Docker Compose runs the API with Prometheus.",
+      "stack": "Python, scikit-learn, FastAPI, Docker, Prometheus, DVC, MLflow, GitHub Actions",
+      "evidence": [
+        {
+          "kind": "ran",
+          "text": "GitHub Actions run 42863988828: 172 passed, lint and format clean; reproduced from a fresh clone on 2026-11-14."
+        },
+        {
+          "kind": "ran",
+          "text": "Kaggle re-run from the raw CSVs on 2026-11-14: test PR-AUC 0.0670 and ROC-AUC 0.6115, matching the saved model."
+        },
+        {
+          "kind": "doc",
+          "text": "Feature parity on 14,470 validation rows and 821 features, maximum difference 0, measured on the original workstation."
+        },
+        {
+          "kind": "gap",
+          "text": "Purchase-time availability of every feature is not verified, and there is no DVC remote."
+        }
+      ],
+      "status": "Educational project, not deployed. The model is weak: test ROC-AUC 0.61 at a 4.28% late rate.",
+      "source": {
+        "label": "Read the code",
+        "url": "https://github.com/tahamohmadf19-dev/olist-mlops-project"
+      },
+      "role": "My project in an MLOps training course. The model-evaluation write-up and the Kaggle reproduction were added in November 2026 with an AI coding agent.",
+      "trace_title": "One late-delivery prediction",
+      "trace": [
+        {
+          "name": "Olist orders",
+          "kind": "store",
+          "note": "Public Olist orders, items, payments and reviews, joined into one row per order."
+        },
+        {
+          "name": "Chronological split",
+          "kind": "gate",
+          "note": "Train, validation and test periods are split by purchase date, so the test period is later than anything used for fitting."
+        },
+        {
+          "name": "Shared features",
+          "kind": "step",
+          "note": "Deterministic feature code used by both the notebooks and the service; explicit future and target fields are blocked."
+        },
+        {
+          "name": "Model and threshold",
+          "kind": "step",
+          "note": "Logistic regression chosen on validation PR-AUC; the decision threshold is chosen on validation only."
+        },
+        {
+          "name": "Feature parity",
+          "kind": "gate",
+          "note": "A script compares the service's features with the saved training matrix before a release."
+        },
+        {
+          "name": "Inference API",
+          "kind": "step",
+          "note": "FastAPI single and batch prediction endpoints with input checks and a model fingerprint in every response."
+        },
+        {
+          "name": "Monitoring",
+          "kind": "gate",
+          "note": "Prometheus metrics and alert rules; the drift check reports insufficient data below 200 scores instead of claiming no drift."
+        }
+      ],
+      "decisions": [
+        "Reported the weak test result (ROC-AUC 0.61, accuracy below an always-on-time baseline at the chosen threshold) instead of accuracy alone.",
+        "Chose the threshold on validation only and used the later test period once.",
+        "Documented the point-in-time leakage risk of historical aggregates instead of claiming real-time readiness.",
+        "Kept data and model files out of Git, tracked by DVC pointers, and stated that a fresh clone cannot serve predictions."
+      ],
+      "tested": [
+        "172 tests in GitHub Actions (run 42863988828), reproduced from a fresh clone on 2026-11-14.",
+        "Kaggle re-run from raw data: test PR-AUC 0.06704 and ROC-AUC 0.6115, matching the saved bundle.",
+        "Validation ROC-AUC 0.746 and PR-AUC 0.125; test ROC-AUC 0.611 and PR-AUC 0.067 at a 4.28% late rate."
+      ],
+      "limits": [
+        "Not verified for purchase-time inference: some aggregates may include later updates.",
+        "No DVC remote or published model, so a fresh clone runs the tests but cannot serve predictions.",
+        "No alert notification channel and no store joining predictions with outcomes.",
+        "The model's predictive value is weak; the project's value is the inference engineering."
+      ]
+    },
+    {
       "id": "rag-quality-lab",
       "name": "RAG Quality Lab",
       "shows": "RAG evaluation",
@@ -439,13 +538,6 @@
   ],
   "more_work": [
     {
-      "name": "Olist MLOps Inference Service",
-      "text": "Packages a fitted scikit-learn late-delivery classifier into a FastAPI service with feature-parity checks against the training notebooks, Prometheus metrics and alert rules, DVC and MLflow. The model itself is weak: test ROC-AUC 0.61 at a 4.28% late rate.",
-      "evidence": "172 tests pass in GitHub Actions. A Kaggle notebook re-runs the pipeline from the raw Olist data and reproduces the saved test PR-AUC (0.0670).",
-      "status": "Educational MLOps project. Documentation and the Kaggle reproduction were added in November 2026 with an AI coding agent. Public since 2026-11-10.",
-      "url": "https://github.com/tahamohmadf19-dev/olist-mlops-project"
-    },
-    {
       "name": "RAG Document Search",
       "text": "Upload a PDF, ask a question, and get an extracted sentence with page citations. It uses Qdrant and local lexical embeddings, with no LLM.",
       "evidence": "26 tests pass. On 4 short synthetic documents: 14 of 14 answers correct and 5 of 5 unanswerable questions declined; on 8 held-out questions, 4 of 4 unrelated ones declined and 3 of 4 answered. It can refuse paraphrases that share few words.",
@@ -482,8 +574,8 @@
     {
       "title": "Measure before claiming",
       "text": "Evaluation comes with the system, and a missing measurement stays missing.",
-      "see": "rag-quality-lab",
-      "see_label": "RAG Quality Lab"
+      "see": "olist-mlops",
+      "see_label": "Olist MLOps"
     },
     {
       "title": "Keep authority out of the model",
@@ -645,11 +737,13 @@
     "Resume: owner approval of the PDF linked from this site.": "Held: no resume PDF or link is published (cv_url is null).",
     "EduSmartAI: whether the owner was a team member, and the reason PR #7 closed.": "Only facts visible on GitHub are stated (owner, branch, PR #7 closed without review). No team membership is claimed.",
     "AI assistance: owner approval of the wording used in About and on the project pages.": "Kept as a truthful disclosure: the commits credit an AI coding agent. The owner may reword it.",
-    "ClientPilot AI: owner decision on the prompt that hides automation from customers.": "Held with ClientPilot AI (held_projects)."
+    "ClientPilot AI: owner decision on the prompt that hides automation from customers.": "Held with ClientPilot AI (held_projects).",
+    "Private repositories": "Owner rule 2026-11-15: private projects (RAG Quality Lab, ClientPilot AI, Shortform Pro) are never featured publicly."
   },
   "held_projects": [
     "clientpilot",
-    "shortform"
+    "shortform",
+    "rag-quality-lab"
   ],
-  "featured": "rag-quality-lab"
+  "featured": "olist-mlops"
 }

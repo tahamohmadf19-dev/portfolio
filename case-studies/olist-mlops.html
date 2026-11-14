@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; style-src &#x27;self&#x27;; script-src &#x27;self&#x27;; font-src &#x27;self&#x27;; img-src &#x27;self&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0B0F12">
+<title>Olist MLOps case study | Mohammad Taha Alhmad</title>
+<meta name="description" content="Predict whether an Olist e-commerce order will arrive late, and serve that prediction through a tested, monitored API instead of a notebook.">
+<link rel="canonical" href="https://tahamohmadf19-dev.github.io/portfolio/case-studies/olist-mlops.html">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Olist MLOps case study | Mohammad Taha Alhmad">
+<meta property="og:description" content="Predict whether an Olist e-commerce order will arrive late, and serve that prediction through a tested, monitored API instead of a notebook.">
+<meta property="og:url" content="https://tahamohmadf19-dev.github.io/portfolio/case-studies/olist-mlops.html">
+<meta property="og:image" content="https://tahamohmadf19-dev.github.io/portfolio/assets/og.png">
+<meta property="og:image:alt" content="Mohammad Taha Alhmad, AI Engineer.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/source-serif-4.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/site.css?v=82d4a4a3">
+<script src="../assets/site.js?v=f1688dcb"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="top-inner">
+    <a class="home" href="../index.html"><span class="home-full">Mohammad Taha Alhmad</span><span class="home-short" aria-hidden="true">MTA</span></a>
+    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav">
+      <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>Menu
+    </button>
+    <nav id="site-nav" aria-label="Sections">
+      <ul>
+        <li><a href="../index.html#work">Work</a></li>
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#expertise">Expertise</a></li>
+        <li><a href="../index.html#experience">Experience</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="case">
+  <section class="case-head">
+    <p class="crumb"><a class="ul" href="../index.html#olist-mlops">Back to selected work</a></p>
+    <div class="project-kicker"><p class="shows">MLOps and model serving</p><p class="state">Educational prototype</p></div>
+    <h1 id="name">Olist MLOps</h1>
+    <p class="statement">Predict whether an Olist e-commerce order will arrive late, and serve that prediction through a tested, monitored API instead of a notebook.</p>
+    <dl class="foot-facts">
+      <div><dt>Status</dt><dd>Educational project, not deployed. The model is weak: test ROC-AUC 0.61 at a 4.28% late rate.</dd></div>
+      <div><dt>Source</dt><dd><a class="ul" href="https://github.com/tahamohmadf19-dev/olist-mlops-project" rel="noopener noreferrer">Read the code</a></dd></div>
+      <div><dt>Stack</dt><dd>Python, scikit-learn, FastAPI, Docker, Prometheus, DVC, MLflow, GitHub Actions</dd></div>
+    </dl>
+  </section>
+  
+  <section class="case-block" data-reveal aria-labelledby="role-title">
+    <h2 id="role-title">My role</h2>
+    <p class="case-text">My project in an MLOps training course. The model-evaluation write-up and the Kaggle reproduction were added in November 2026 with an AI coding agent.</p>
+  </section>
+  <section class="case-block" aria-labelledby="path-title">
+    <h2 id="path-title">How it works</h2>
+    <div class="case-text"><p>This diagram follows the real path through the code. Select a stage to read what happens there. Stages marked with a diamond <span class="legend-mark" aria-hidden="true"></span> are control points, where the system checks, stops or waits for a person.</p></div>
+    <div class="project case-panel" data-reveal><figure class="trace-wrap"><figcaption>One late-delivery prediction</figcaption><ol class="trace"><li class="stage stage-store"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="olist-mlops-stage-0"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Olist orders</span><span class="sr">, data</span></button><div class="stage-note" id="olist-mlops-stage-0"><p><span class="stage-kind">Data</span> Public Olist orders, items, payments and reviews, joined into one row per order.</p></div></li><li class="stage stage-gate"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="olist-mlops-stage-1"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Chronological split</span><span class="sr">, control point</span></button><div class="stage-note" id="olist-mlops-stage-1"><p><span class="stage-kind">Control point</span> Train, validation and test periods are split by purchase date, so the test period is later than anything used for fitting.</p></div></li><li class="stage stage-step"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="olist-mlops-stage-2"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Shared features</span><span class="sr">, step</span></button><div class="stage-note" id="olist-mlops-stage-2"><p><span class="stage-kind">Step</span> Deterministic feature code used by both the notebooks and the service; explicit future and target fields are blocked.</p></div></li><li class="stage stage-step"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="olist-mlops-stage-3"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Model and threshold</span><span class="sr">, step</span></button><div class="stage-note" id="olist-mlops-stage-3"><p><span class="stage-kind">Step</span> Logistic regression chosen on validation PR-AUC; the decision threshold is chosen on validation only.</p></div></li><li class="stage stage-gate"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="olist-mlops-stage-4"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Feature parity</span><span class="sr">, control point</span></button><div class="stage-note" id="olist-mlops-stage-4"><p><span class="stage-kind">Control point</span> A script compares the service&#x27;s features with the saved training matrix before a release.</p></div></li><li class="stage stage-step"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="olist-mlops-stage-5"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Inference API</span><span class="sr">, step</span></button><div class="stage-note" id="olist-mlops-stage-5"><p><span class="stage-kind">Step</span> FastAPI single and batch prediction endpoints with input checks and a model fingerprint in every response.</p></div></li><li class="stage stage-gate"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="olist-mlops-stage-6"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Monitoring</span><span class="sr">, control point</span></button><div class="stage-note" id="olist-mlops-stage-6"><p><span class="stage-kind">Control point</span> Prometheus metrics and alert rules; the drift check reports insufficient data below 200 scores instead of claiming no drift.</p></div></li></ol></figure></div>
+  </section>
+  <section class="case-block" data-reveal aria-labelledby="decisions-title">
+    <h2 id="decisions-title">Engineering decisions</h2>
+    <ul class="case-list"><li>Reported the weak test result (ROC-AUC 0.61, accuracy below an always-on-time baseline at the chosen threshold) instead of accuracy alone.</li><li>Chose the threshold on validation only and used the later test period once.</li><li>Documented the point-in-time leakage risk of historical aggregates instead of claiming real-time readiness.</li><li>Kept data and model files out of Git, tracked by DVC pointers, and stated that a fresh clone cannot serve predictions.</li></ul>
+  </section>
+  <section class="case-block" data-reveal aria-labelledby="tested-title">
+    <h2 id="tested-title">What was tested</h2>
+    <ul class="case-list"><li>172 tests in GitHub Actions (run 42863988828), reproduced from a fresh clone on 2026-11-14.</li><li>Kaggle re-run from raw data: test PR-AUC 0.06704 and ROC-AUC 0.6115, matching the saved bundle.</li><li>Validation ROC-AUC 0.746 and PR-AUC 0.125; test ROC-AUC 0.611 and PR-AUC 0.067 at a 4.28% late rate.</li></ul>
+  </section>
+  <section class="case-block" data-reveal aria-labelledby="limits-title">
+    <h2 id="limits-title">Limits and open work</h2>
+    <ul class="case-list"><li>Not verified for purchase-time inference: some aggregates may include later updates.</li><li>No DVC remote or published model, so a fresh clone runs the tests but cannot serve predictions.</li><li>No alert notification channel and no store joining predictions with outcomes.</li><li>The model&#x27;s predictive value is weak; the project&#x27;s value is the inference engineering.</li></ul>
+  </section>
+</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <p>Mohammad Taha Alhmad, AI Engineer</p>
+    <a class="ul" href="#main">Back to top</a>
+  </div>
+</footer>
+</body>
+</html>

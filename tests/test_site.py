@@ -162,12 +162,13 @@ def test_without_an_approved_resume_no_pdf_is_published_or_linked():
 
 
 def test_held_projects_are_not_published():
-    assert HELD == {"clientpilot", "shortform"}
+    assert HELD == {"clientpilot", "shortform", "rag-quality-lab"}  # private repositories are never featured
     for held in HELD:
         assert f'id="{held}"' not in HTML and f"case-studies/{held}.html" not in HTML
         assert not (ROOT / "case-studies" / f"{held}.html").exists()
     for page in ALL_PAGES:
-        assert "ClientPilot" not in page and "Shortform" not in page
+        for private in ("ClientPilot", "Shortform", "RAG Quality Lab", "Onyx", "mb-digital"):
+            assert private not in page, private
 
 
 def test_hero_has_identity_photo_and_actions():
