@@ -1,4 +1,5 @@
 """Checks on the built page. Run with: python -m pytest"""
+import hashlib
 import json
 import re
 import subprocess
@@ -130,10 +131,6 @@ def test_external_links_are_safe(page):
         "production-ready",
         "Senior",
         "@BabyPutcast",
-        "mb-digital",
-        "MB DIGITAL",
-        "clientpilot-ai",
-        "GreenLead",
         "Microsoft Certified",
     ],
 )
@@ -161,14 +158,22 @@ def test_without_an_approved_resume_no_pdf_is_published_or_linked():
         assert ".pdf" not in page and "Download resume" not in page
 
 
-def test_held_projects_are_not_published():
-    assert HELD == {"clientpilot", "shortform", "rag-quality-lab"}  # private repositories are never featured
-    for held in HELD:
-        assert f'id="{held}"' not in HTML and f"case-studies/{held}.html" not in HTML
-        assert not (ROOT / "case-studies" / f"{held}.html").exists()
-    for page in ALL_PAGES:
-        for private in ("ClientPilot", "Shortform", "RAG Quality Lab", "Onyx", "mb-digital"):
-            assert private not in page, private
+def _tokens(text):
+    words = re.findall(r"[a-z0-9]+", text.lower())
+    return set(words) | {" ".join(pair) for pair in zip(words, words[1:])}
+
+
+# Names of private projects, stored only as hashes so this public file does not name them.
+PRIVATE_NAME_HASHES = {'4199e3826bdc993d', '3af678608d3c5a09', '94bc03de3debf388', 'd077be52a1994b92', '5ae142311f2a477f', '7259fd6a6d933489', '1c5483264189feef'}
+
+
+def test_private_projects_never_appear_in_public_files():
+    """Owner rule 2026-11-15: private repositories are never described or linked publicly."""
+    public_text = [HTML, *CASE_PAGES.values(), (ROOT / "content" / "profile.json").read_text(encoding="utf-8")]
+    for text in public_text:
+        found = {hashlib.sha256(tok.encode()).hexdigest()[:16] for tok in _tokens(text)} & PRIVATE_NAME_HASHES
+        assert not found, found
+    assert "held_projects" not in DATA
 
 
 def test_hero_has_identity_photo_and_actions():
@@ -307,8 +312,8 @@ def test_corrected_claims_do_not_return(text):
 
 def test_ai_assistance_is_disclosed_where_known():
     by_id = {p["id"]: p for p in DATA["projects"]}
-    assert "AI coding agent" in by_id["shortform"]["role"]
     assert "AI coding agent" in by_id["edusmartai"]["role"]
+    assert "AI coding agent" in by_id["olist-mlops"]["role"]
     for item in DATA["more_work"]:
         assert "AI coding agent" in item["status"], item["name"]
     assert "AI coding agents" in " ".join(DATA["about"])
@@ -317,24 +322,16 @@ def test_ai_assistance_is_disclosed_where_known():
 def test_work_published_on_2026_11_14_says_so():
     for item in DATA["more_work"]:
         assert re.search(r"Public since 2026-11-\d\d", item["status"]) and "not public" not in item["status"], item["name"]
-    assert any("public repository still shows version 1" in x for x in {p["id"]: p for p in DATA["projects"]}["shortform"]["limits"])
 
 
 def test_attribution_of_others_work_is_explicit():
     edu = {p["id"]: p for p in DATA["projects"]}["edusmartai"]
     assert "He had already documented" in edu["role"] and "wrote the retriever" in edu["role"]
-    client = {p["id"]: p for p in DATA["projects"]}["clientpilot"]
-    assert "Nic Chin" in client["role"] and "MIT" in client["role"]
-    assert "Onyx" in {p["id"]: p for p in DATA["projects"]}["rag-quality-lab"]["role"]
 
 
-def test_clientpilot_states_its_failing_tests_and_no_live_run():
-    if "clientpilot" in HELD:
-        pytest.skip("ClientPilot is held from this release.")
-    block = re.search(r'<article class="project"[^>]*id="clientpilot".*?</article>', HTML, re.DOTALL).group(0)
-    assert "56 passed, 9 failed, 1 suite did not load" in block
-    assert "They are not fixed" in block
-    assert "No live run" in block
+def test_featured_mlops_project_states_its_weak_model_result():
+    olist = {p["id"]: p for p in DATA["projects"]}["olist-mlops"]
+    assert "0.61" in olist["status"] and "not deployed" in olist["status"]
 
 
 def test_every_featured_project_states_it_is_not_deployed_or_merged():
@@ -344,7 +341,7 @@ def test_every_featured_project_states_it_is_not_deployed_or_merged():
 
 def test_evidence_images_exist_with_alt_text_and_captions():
     media = [p["media"] for p in SHOWN if p.get("media")] + [m["media"] for m in DATA["more_work"] if m.get("media")]
-    assert len(media) == 2 - sum(1 for p in DATA["projects"] if p["id"] in HELD and p.get("media"))
+    assert len(media) >= 1
     for item in media:
         assert (ROOT / item["src"]).exists() and item["alt"] and "real" in item["caption"].lower()
 
@@ -363,16 +360,13 @@ def test_case_pages_have_working_local_links():
         assert not [a for _, a in parser.tags if "style" in a]
 
 
-def test_private_projects_link_to_no_source():
+def test_every_published_project_links_to_public_source():
     for project in DATA["projects"]:
-        if project["id"] in {"rag-quality-lab", "clientpilot", "shortform"}:
-            assert project["source"]["url"] is None
+        assert project["source"]["url"].startswith("https://github.com/tahamohmadf19-dev/"), project["id"]
 
 
 def test_derived_work_is_credited():
     text = {p["id"]: json.dumps(p) for p in DATA["projects"]}
-    assert "Onyx" in text["rag-quality-lab"]
-    assert "DocsFlow" in text["clientpilot"]
     assert "@bahaaed07706" in text["edusmartai"] and "not merged" in text["edusmartai"]
 
 
@@ -479,7 +473,7 @@ def test_hidden_states_depend_on_the_script():
 
 
 def test_hero_path_matches_the_real_project():
-    project = next(p for p in SHOWN if p["id"] == DATA.get("featured", "clientpilot"))
+    project = next(p for p in SHOWN if p["id"] == DATA.get("featured", ""))
     block = re.search(r'<figure class="path.*?</figure>', HTML, re.DOTALL).group(0)
     assert re.findall(r'<span class="path-name">(.+?)</span>', block) == [s["name"] for s in project["trace"]]
     assert "a prototype" in block

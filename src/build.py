@@ -317,7 +317,7 @@ def render(data: dict) -> str:
     labels = data["evidence_labels"]
     links = "".join(f"<li>{external(link['url'], link['label'])}</li>" for link in person["links"])
     shown = published_projects(data)
-    featured = next((p for p in shown if p["id"] == data.get("featured", "clientpilot")), shown[0])
+    featured = next((p for p in shown if p["id"] == data.get("featured", "")), shown[0])
     index = "".join(
         f'<li><a href="#{e(p["id"])}"><span class="index-name">{e(p["name"])}</span><span class="index-shows">{e(p["shows"])}</span></a></li>'
         for p in shown
