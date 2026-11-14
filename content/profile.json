@@ -439,6 +439,13 @@
   ],
   "more_work": [
     {
+      "name": "Olist MLOps Inference Service",
+      "text": "Packages a fitted scikit-learn late-delivery classifier into a FastAPI service with feature-parity checks against the training notebooks, Prometheus metrics and alert rules, DVC and MLflow. The model itself is weak: test ROC-AUC 0.61 at a 4.28% late rate.",
+      "evidence": "172 tests pass in GitHub Actions. A Kaggle notebook re-runs the pipeline from the raw Olist data and reproduces the saved test PR-AUC (0.0670).",
+      "status": "Educational MLOps project. Documentation and the Kaggle reproduction were added in November 2026 with an AI coding agent. Public since 2026-11-10.",
+      "url": "https://github.com/tahamohmadf19-dev/olist-mlops-project"
+    },
+    {
       "name": "RAG Document Search",
       "text": "Upload a PDF, ask a question, and get an extracted sentence with page citations. It uses Qdrant and local lexical embeddings, with no LLM.",
       "evidence": "26 tests pass. On 4 short synthetic documents: 14 of 14 answers correct and 5 of 5 unanswerable questions declined; on 8 held-out questions, 4 of 4 unrelated ones declined and 3 of 4 answered. It can refuse paraphrases that share few words.",
@@ -462,7 +469,7 @@
     {
       "name": "Bank Marketing Classification",
       "text": "A PySpark notebook on 45,211 records, compared against baselines. All models use call duration, which is only known after a call, so this is not a pre-call predictor.",
-      "evidence": "Rerun from a clean environment: test ROC-AUC 0.9268. The 6 repository tests check saved outputs and do not retrain.",
+      "evidence": "Rerun from a clean environment: test ROC-AUC 0.9268; a Kaggle run of the same notebook gave 0.9251. The 6 repository tests check saved outputs and do not retrain.",
       "status": "My 2025 coursework. The rerun and baselines were added in November 2026 with an AI coding agent. Public since 2026-11-14.",
       "url": "https://github.com/tahamohmadf19-dev/bank-marketing-classification"
     }

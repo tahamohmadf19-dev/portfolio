@@ -315,7 +315,7 @@ def test_ai_assistance_is_disclosed_where_known():
 
 def test_work_published_on_2026_11_14_says_so():
     for item in DATA["more_work"]:
-        assert "Public since 2026-11-14" in item["status"] and "not public" not in item["status"], item["name"]
+        assert re.search(r"Public since 2026-11-\d\d", item["status"]) and "not public" not in item["status"], item["name"]
     assert any("public repository still shows version 1" in x for x in {p["id"]: p for p in DATA["projects"]}["shortform"]["limits"])
 
 
