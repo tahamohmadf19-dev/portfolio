@@ -1,0 +1,648 @@
+{
+  "unconfirmed": [],
+  "person": {
+    "name": "Mohammad Taha Alhmad",
+    "title": "AI Engineer",
+    "positioning": "AI Engineer | LLMs | RAG | Agentic Systems | AI Automation",
+    "statement": "I design and build practical AI systems, intelligent automation, LLM applications and backend integrations.",
+    "location": "Amman, Jordan",
+    "availability": "Open to AI Engineer roles. Open to relocation.",
+    "email": "tahamohmadf19@gmail.com",
+    "site_url": "https://tahamohmadf19-dev.github.io/portfolio/",
+    "description": "Mohammad Taha Alhmad is an AI Engineer in Amman building LLM applications, RAG evaluation, agent workflows and backend integrations. Each project states what was built, what was tested and what is unfinished.",
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/tahamohmadf19-dev"
+      },
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/mohmad-taha-alhmad/"
+      },
+      {
+        "label": "Kaggle",
+        "url": "https://www.kaggle.com/tahamohmad"
+      }
+    ],
+    "cv_url": null,
+    "stack_line": [
+      "Python",
+      "FastAPI",
+      "TypeScript",
+      "LangGraph",
+      "RAG",
+      "Pinecone",
+      "Qdrant",
+      "AWS Bedrock",
+      "n8n"
+    ]
+  },
+  "projects": [
+    {
+      "id": "rag-quality-lab",
+      "name": "RAG Quality Lab",
+      "shows": "RAG evaluation",
+      "state": "Prototype",
+      "problem": "When a team changes a RAG system, it is hard to tell whether answers improved, or why one answer cited the wrong source.",
+      "built": [
+        "An evaluation and debugging layer added to Onyx Community Edition, an open-source RAG platform.",
+        "Versioned test datasets, background runs and saved results for each test case.",
+        "Six retrieval and citation metrics, plus an optional LLM judge that cannot change them.",
+        "An admin dashboard, a read-only retrieval debugger, and rule-based checks for risky text in ingested documents."
+      ],
+      "works": [
+        "Metrics leave a value undefined when it cannot be measured, instead of counting it as zero.",
+        "A failed test case is saved and the run continues.",
+        "If the judge fails, the case still succeeds with an empty judge score."
+      ],
+      "architecture": "Python and FastAPI services inside Onyx, Celery for background runs, SQLAlchemy migrations, and React admin pages.",
+      "stack": "Python, FastAPI, Celery, SQLAlchemy, Pydantic, TypeScript, React",
+      "evidence": [
+        {
+          "kind": "ran",
+          "text": "All 411 unit tests I added passed on 2026-11-07: 236 backend and 175 frontend, with the database, LLM and task broker replaced by fakes."
+        },
+        {
+          "kind": "code",
+          "text": "Migrations, API routes and dashboard pages are in the code. The pages have not been viewed running."
+        },
+        {
+          "kind": "gap",
+          "text": "Not run end to end, and not evaluated on a real document collection."
+        }
+      ],
+      "status": "Prototype, not deployed.",
+      "source": {
+        "label": "Private repository. Walkthrough on request.",
+        "url": null
+      },
+      "role": "My personal project: I added this layer to Onyx Community Edition. Onyx provides the platform, including its chat pipeline and connectors. The private repository is a derivative of it, and credits it in UPSTREAM.md. Its top-level README still needs to say so before any public release.",
+      "trace_title": "One evaluation run",
+      "trace": [
+        {
+          "name": "Dataset version",
+          "kind": "store",
+          "note": "Test cases are frozen into an immutable dataset version, so two runs can be compared on exactly the same questions."
+        },
+        {
+          "name": "Background run",
+          "kind": "step",
+          "note": "A Celery task works through the cases. A case that raises is saved as failed and the run continues, so one bad case cannot erase the others."
+        },
+        {
+          "name": "Chat pipeline",
+          "kind": "step",
+          "note": "Each case calls the platform's existing evaluation entry point, which runs its chat pipeline inside a rolled-back transaction. So far this path has only been tested with a fake executor."
+        },
+        {
+          "name": "Deterministic metrics",
+          "kind": "step",
+          "note": "Recall@k, precision@k, MRR, citation validity, citation density and cited context ratio. These are pure functions with no model calls, so equal inputs give equal scores."
+        },
+        {
+          "name": "Optional LLM judge",
+          "kind": "gate",
+          "note": "Scores correctness, groundedness and semantic citation coverage after the deterministic metrics are computed. If the judge is off or fails, the case stays successful with an empty score."
+        },
+        {
+          "name": "Aggregate",
+          "kind": "gate",
+          "note": "A metric that cannot be measured stays undefined and is skipped. It is never counted as zero, and the dashboard code shows it as a dash, so missing data cannot pass as a bad result."
+        },
+        {
+          "name": "Review",
+          "kind": "step",
+          "note": "An admin dashboard shows run summaries and per-case results. A separate read-only debugger shows the ranked documents, scores and citations behind a past answer."
+        }
+      ],
+      "decisions": [
+        "Separated what is measured from what is judged. An LLM judge cannot change a deterministic score.",
+        "Treated \"not measurable\" as different from zero across the metrics, API and interface.",
+        "Called the platform's existing chat pipeline for evaluation instead of writing a test-only copy.",
+        "Kept the prompt-injection and credential detectors narrow, to limit false alarms."
+      ],
+      "tested": [
+        "Evaluation: 122 passed. Metrics 48, aggregation 17, judge 26, runner 27, dispatch 4.",
+        "Knowledge operations and ingestion security: 70 passed.",
+        "Retrieval debugger: 37 passed. Citation privacy: 7 passed.",
+        "Frontend: 175 passed in 17 suites, 106 of them for the evaluation dashboard and debugger.",
+        "Run at commit c28ad87 from a clean copy with the project's own environment. The database, LLM and Celery broker were replaced by fakes."
+      ],
+      "limits": [
+        "Never run end to end against the full platform in this check, so the real chat path is untested.",
+        "No evaluation report on a real document collection yet.",
+        "This is an extension of Onyx, not an independent RAG platform.",
+        "The dashboard has not been viewed running."
+      ]
+    },
+    {
+      "id": "clientpilot",
+      "name": "ClientPilot AI",
+      "shows": "Agents and multi-tenant retrieval",
+      "state": "Prototype",
+      "problem": "One operator supporting several businesses on Facebook Messenger needs AI replies grounded in each client's own knowledge, without exposing one client's data or tokens to another.",
+      "built": [
+        "Extended open-source DocsFlow (MIT license) into a single-operator support product with client records and per-client knowledge.",
+        "A background worker for Messenger: signature check, event claim, autopilot check and confidence check.",
+        "A LangGraph agent flow with a step limit, a tenant-scoped database wrapper and encrypted token storage."
+      ],
+      "works": [
+        "The database wrapper adds the tenant filter and rejects a missing tenant, tested against a mock database.",
+        "A source scan fails if a Meta token could reach a URL or browser storage.",
+        "The search function takes only a query. Tenant and client IDs stay in server code."
+      ],
+      "architecture": "Next.js API routes, a QStash-signed worker, a LangGraph supervisor, Pinecone namespaces per client, and Supabase.",
+      "stack": "TypeScript, Next.js, LangGraph, Pinecone, Supabase, QStash, Meta Graph API",
+      "evidence": [
+        {
+          "kind": "ran",
+          "text": "41 of 41 security tests passed: 22 tenant-isolation tests against a mock, and a 19-check source scan."
+        },
+        {
+          "kind": "ran",
+          "text": "Whole suite: 56 passed, 9 failed, 1 suite did not load. All three failing files are upstream DocsFlow tests I did not change. They are not fixed."
+        },
+        {
+          "kind": "code",
+          "text": "The worker and agent graph have no automated tests."
+        },
+        {
+          "kind": "gap",
+          "text": "No live run against Meta, Pinecone or QStash is verified."
+        }
+      ],
+      "status": "Prototype, not deployed.",
+      "source": {
+        "label": "Private repository. Walkthrough on request.",
+        "url": null
+      },
+      "role": "I extended open-source DocsFlow by Nic Chin (MIT license). DocsFlow provides the base application. The agent graph, tenant wrapper, token vault, message worker and security tests are from my commits.",
+      "trace_title": "One inbound message",
+      "trace": [
+        {
+          "name": "Signed queue",
+          "kind": "gate",
+          "note": "The worker accepts only requests with a valid QStash signature. Temporary failures return an error so the queue retries the message."
+        },
+        {
+          "name": "Idempotency claim",
+          "kind": "gate",
+          "note": "Each provider event is claimed through a unique index, so a retried delivery that has already finished is skipped."
+        },
+        {
+          "name": "Tenant scope",
+          "kind": "gate",
+          "note": "The Page ID resolves to a tenant and client. Client data is then read through a tenant-scoped wrapper that fails if the tenant is missing. Event and message logs use the service client with an explicit tenant ID."
+        },
+        {
+          "name": "Autopilot check",
+          "kind": "gate",
+          "note": "The client must be active with autopilot on. Otherwise the message is logged as skipped and nothing is sent."
+        },
+        {
+          "name": "Supervisor graph",
+          "kind": "step",
+          "note": "A LangGraph supervisor routes between research, synthesis, drafting and abstention. A budget of 5 steps forces abstention, so the graph cannot loop forever. If it abstains, the worker falls back to single-pass retrieval."
+        },
+        {
+          "name": "Scoped retrieval",
+          "kind": "store",
+          "note": "The search function accepts only a query. Tenant and client IDs come from server code and select the Pinecone namespace, so message text cannot widen the search."
+        },
+        {
+          "name": "Confidence check",
+          "kind": "gate",
+          "note": "Below the client's threshold, the system sends a configured fallback, or sends nothing and logs the event. The page token is decrypted only just before sending."
+        }
+      ],
+      "decisions": [
+        "Kept tenant and client identity out of the model's input instead of relying on prompt wording.",
+        "Put tenant filtering in one database wrapper, because the service role key bypasses row-level security.",
+        "Stored Meta tokens with AES-256-GCM, and added a source scan that fails on known leak patterns.",
+        "Logged the main outcomes separately: skipped, low confidence, failed and sent."
+      ],
+      "tested": [
+        "Tenant isolation: 22 of 22, against a mock Supabase client, not a real database.",
+        "Token leak: 19 of 19. This scans source text and does not run the system.",
+        "Whole suite on 2026-11-07: 56 passed, 9 failed, 1 suite did not load.",
+        "The failures are upstream tests. Seven cover the parser and an older feature-flag API, two need an API key, and one suite imports a route that no longer exists."
+      ],
+      "limits": [
+        "The worker and agent graph have no automated tests, and no live run is verified.",
+        "If a send succeeds and logging then hits a temporary error, a retry could send the reply again.",
+        "Once autopilot is on, replies go out with no human review, and the current prompt tells the model not to reveal automation. Both need a decision before any real customer use.",
+        "A newer database schema is documented as verified, but the application has not been moved to it.",
+        "The README still carries upstream DocsFlow text."
+      ]
+    },
+    {
+      "id": "edusmartai",
+      "name": "EduSmartAI",
+      "shows": "Machine learning and secure backend",
+      "state": "Unmerged contribution",
+      "problem": "An academic platform needed to warn about struggling students early, but its old 0.979 score relied on data only known after a course ended.",
+      "built": [
+        "On a branch of a graduation project by @bahaaed07706: early-risk models for day 14, 28 and 42, using only data visible by that day.",
+        "Student-grouped validation, a temporal holdout and confidence intervals.",
+        "Shared feature code for training and serving, rule-based explanations and intervention tracking.",
+        "Token revocation, audit logging, rate limiting, and a PostgreSQL path."
+      ],
+      "works": [
+        "Models retrained from the branch reproduce its reported results.",
+        "ROC-AUC rises from 0.566 at day 14, close to chance, to 0.729 at day 42.",
+        "Backend security, intervention and serving behavior pass their tests."
+      ],
+      "architecture": "FastAPI and SQLAlchemy backend, scikit-learn pipelines per cut-off, and a React frontend with Arabic and English.",
+      "stack": "Python, FastAPI, scikit-learn, SQLAlchemy, PostgreSQL, React",
+      "evidence": [
+        {
+          "kind": "ran",
+          "text": "Retrained on 2026-11-07: ROC-AUC 0.566, 0.677 and 0.729, matching the report."
+        },
+        {
+          "kind": "ran",
+          "text": "Backend tests: 220 passed, 3 skipped, at commit 73583aa."
+        },
+        {
+          "kind": "code",
+          "text": "Frontend tests and the live PostgreSQL integration were not run."
+        }
+      ],
+      "status": "Branch not merged. PR #7 was closed with no review.",
+      "source": {
+        "label": "Read the branch",
+        "url": "https://github.com/tahamohmadf19-dev/EduSmartAI/tree/feature/prod-1"
+      },
+      "role": "EduSmartAI is a graduation project by @bahaaed07706, who built and owns it. He had already documented that the old 0.979 was inflated by leakage, and he wrote the retriever. My branch builds the replacement models and the backend hardening around them. Its commits credit an AI coding agent as co-author.",
+      "trace_title": "One early-risk prediction",
+      "trace": [
+        {
+          "name": "Course activity",
+          "kind": "store",
+          "note": "Attendance, submissions and engagement records for each student and course."
+        },
+        {
+          "name": "Temporal cut-off",
+          "kind": "gate",
+          "note": "At day 14, 28 or 42, only events visible by that day are used, which avoids the leakage in the old evaluation."
+        },
+        {
+          "name": "Group-aware validation",
+          "kind": "gate",
+          "note": "StratifiedGroupKFold keeps each student on one side of every split, with a temporal holdout and bootstrap confidence intervals."
+        },
+        {
+          "name": "Early-risk model",
+          "kind": "step",
+          "note": "A scikit-learn pipeline per cut-off, trained so that scaling and encoding happen inside each fold."
+        },
+        {
+          "name": "Train-serve parity",
+          "kind": "gate",
+          "note": "Training and serving share one feature module, and tests check that they produce the same features."
+        },
+        {
+          "name": "Explanation",
+          "kind": "step",
+          "note": "Deterministic, rule-based explanations of which signals drove a prediction, with no model-generated text."
+        },
+        {
+          "name": "Intervention",
+          "kind": "step",
+          "note": "Staff can record and track actions taken for a flagged student."
+        }
+      ],
+      "decisions": [
+        "Reported that the day-14 model is close to chance, and called it insufficient for operational use, instead of tuning until it looked better.",
+        "Built replacement models after the project owner documented the leakage in the old 0.979.",
+        "Added server-side token revocation, audit logging and rate limiting to the backend.",
+        "Added a bilingual held-out RAG evaluation, Arabic right-to-left support and accessibility work."
+      ],
+      "tested": [
+        "Retrained with scripts/train_early_risk.py on 2026-11-07.",
+        "ROC-AUC by cut-off: day 14, 0.5657. Day 28, 0.6769. Day 42, 0.7288.",
+        "Accuracy by cut-off: day 14, 0.5536. Day 28, 0.6444. Day 42, 0.6844.",
+        "Backend suite: 220 passed, 3 skipped, at commit 73583aa."
+      ],
+      "limits": [
+        "The legacy 0.979 could not be reproduced, because a source file is not in the repository.",
+        "The branch is not part of the project's main branch.",
+        "The retriever is by the project owner, and it is lexical, not semantic.",
+        "Live LLM answer quality was not evaluated. Frontend tests and the live PostgreSQL integration were not run."
+      ]
+    },
+    {
+      "id": "shortform",
+      "name": "Shortform Pro",
+      "shows": "Automation with human approval",
+      "state": "Version 2 local",
+      "problem": "An unattended video pipeline can look healthy while publishing the wrong thing. Over 90 days, version 1 logged 356 uploads with only 12 distinct titles.",
+      "built": [
+        "Version 1: my own Python and FFmpeg pipeline, publishing daily to YouTube through GitHub Actions.",
+        "Version 2, built in November 2026 with an AI coding agent at my direction: a rebuild after auditing version 1.",
+        "A content state machine, measured quality checks, approval tied to the exact file, and a publish gate."
+      ],
+      "works": [
+        "A real upload is blocked unless approval, live mode, a confirmation phrase and the channel ID all match.",
+        "An uncertain upload moves to a state that a person must resolve, so a retry cannot post a duplicate.",
+        "Rendered Arabic and English samples pass measured checks for format, silence and loudness."
+      ],
+      "architecture": "Python pipeline, FFmpeg rendering, durable JSON state with an event log, and the YouTube Data API behind a gate.",
+      "stack": "Python, FFmpeg, Edge TTS, libass, GitHub Actions, YouTube Data API",
+      "evidence": [
+        {
+          "kind": "ran",
+          "text": "200 tests passed on 2026-11-07, all with fake publishers."
+        },
+        {
+          "kind": "ran",
+          "text": "4 rendered samples measured between -16.0 and -16.3 LUFS. No person has listened to them yet."
+        },
+        {
+          "kind": "ran",
+          "text": "Upload history counted from the state file: 356 uploads, 12 titles, one published 80 times."
+        },
+        {
+          "kind": "gap",
+          "text": "Version 2 has never uploaded a video."
+        }
+      ],
+      "status": "Version 1 is paused. Version 2 is local, and has never uploaded.",
+      "source": {
+        "label": "Private repository. Walkthrough on request.",
+        "url": null
+      },
+      "media": {
+        "src": "assets/evidence/shortform-sample-frames.webp",
+        "width": 1240,
+        "height": 272,
+        "alt": "Eight frames from a rendered Arabic explainer video about why the sky is blue, showing animated diagrams and captions.",
+        "caption": "Frames from a real rendered sample. It has not been published."
+      },
+      "role": "I wrote version 1. The audit and version 2 were done in November 2026 with an AI coding agent, Claude Code, working at my direction. Those commits credit it as co-author.",
+      "trace_title": "One video, from script to platform",
+      "trace": [
+        {
+          "name": "Script catalog",
+          "kind": "store",
+          "note": "Scripts come from a versioned catalog, and each factual claim lists a source. The pipeline makes no LLM call at run time. Duplicates are detected by file hash, title and narration."
+        },
+        {
+          "name": "Narration and captions",
+          "kind": "step",
+          "note": "Per-sentence speech synthesis with word timings, and captions with correct Arabic shaping and right-to-left order."
+        },
+        {
+          "name": "Render",
+          "kind": "step",
+          "note": "Motion graphics in code, a ducked music bed and two-pass loudness normalization, rendered with FFmpeg."
+        },
+        {
+          "name": "Measured checks",
+          "kind": "gate",
+          "note": "Streams, delivery settings, black frames, silence, loudness, peaks and caption timing are measured from the file. A failed check stops the item."
+        },
+        {
+          "name": "Human approval",
+          "kind": "gate",
+          "note": "Approval is tied to the exact file hash. If the file changes, the approval no longer applies."
+        },
+        {
+          "name": "Publish gate",
+          "kind": "gate",
+          "note": "A real upload needs live mode, a written confirmation phrase and the expected channel ID. The default is a dry run."
+        },
+        {
+          "name": "Idempotent slot",
+          "kind": "gate",
+          "note": "Each slot can publish once. If an upload fails after the platform may have received it, the item moves to a reconciliation state for a person to check, so a retry cannot post a duplicate."
+        }
+      ],
+      "decisions": [
+        "Paused version 1 once the audit showed that green CI runs were hiding repeated uploads.",
+        "Moved state out of a database that vanished after each CI run, into durable state with atomic writes.",
+        "Made routing fail on an unknown schedule instead of guessing, after a cron typo sent English slots to Arabic.",
+        "Measured what can be measured, and left creative judgment to a person."
+      ],
+      "tested": [
+        "200 automated tests passed on 2026-11-07, all with fake publishers.",
+        "4 rendered samples, Arabic and English, passed measured checks.",
+        "Upload history counted from the state file: 356 uploads, 12 distinct titles."
+      ],
+      "limits": [
+        "No person has listened to the samples yet, so their quality is unjudged.",
+        "Version 2 has never uploaded, so its live publishing path is unverified and its effect on viewers is unknown.",
+        "Facebook, Instagram and TikTok publishing does not work.",
+        "Version 2 is not pushed, so the public repository still shows version 1."
+      ]
+    }
+  ],
+  "more_work": [
+    {
+      "name": "RAG Document Search",
+      "text": "Upload a PDF, ask a question, and get an extracted sentence with page citations. It uses Qdrant and local lexical embeddings, with no LLM.",
+      "evidence": "26 tests pass. On 4 short synthetic documents: 14 of 14 answers correct and 5 of 5 unanswerable questions declined; on 8 held-out questions, 4 of 4 unrelated ones declined and 3 of 4 answered. It can refuse paraphrases that share few words.",
+      "status": "The working version was written in November 2026 with an AI coding agent. Public since 2026-11-14.",
+      "url": "https://github.com/tahamohmadf19-dev/rag-document-search",
+      "media": {
+        "src": "assets/evidence/rag-document-search-answer.webp",
+        "width": 900,
+        "height": 618,
+        "alt": "The RAG Document Search interface answering a question about a warranty from a sample PDF, with page citations.",
+        "caption": "A real local run on a sample PDF."
+      }
+    },
+    {
+      "name": "AI Agent Router",
+      "text": "A typed LangGraph workflow that classifies a message and routes it to one of two reply nodes.",
+      "evidence": "19 tests pass with a fake model. Not run here against a real LLM.",
+      "status": "My project. Tests and repairs were added in November 2026 with an AI coding agent. Public since 2026-11-14.",
+      "url": "https://github.com/tahamohmadf19-dev/AI-Agent-Router"
+    },
+    {
+      "name": "Bank Marketing Classification",
+      "text": "A PySpark notebook on 45,211 records, compared against baselines. All models use call duration, which is only known after a call, so this is not a pre-call predictor.",
+      "evidence": "Rerun from a clean environment: test ROC-AUC 0.9268. The 6 repository tests check saved outputs and do not retrain.",
+      "status": "My 2025 coursework. The rerun and baselines were added in November 2026 with an AI coding agent. Public since 2026-11-14.",
+      "url": "https://github.com/tahamohmadf19-dev/bank-marketing-classification"
+    }
+  ],
+  "about": [
+    "I am an AI Engineer in Amman with a B.Sc. in Data Science and Artificial Intelligence from Philadelphia University. The part of AI work I care about most starts after the first demo: can it be measured, can it be stopped, and what happens when something fails?",
+    "That is why my projects look the way they do. They track evidence, separate tenants and wait for approval. Most of them build on existing software instead of starting from nothing, and each one says so. I also use AI coding agents in my work, and the project pages say where that is known."
+  ],
+  "approach": [
+    {
+      "title": "Measure before claiming",
+      "text": "Evaluation comes with the system, and a missing measurement stays missing.",
+      "see": "rag-quality-lab",
+      "see_label": "RAG Quality Lab"
+    },
+    {
+      "title": "Keep authority out of the model",
+      "text": "Scope and permissions live in server code, where a prompt cannot change them.",
+      "see": "clientpilot",
+      "see_label": "ClientPilot AI"
+    },
+    {
+      "title": "Give automation a stopping point",
+      "text": "Risky steps wait for a check or a person, and retries cannot repeat them.",
+      "see": "shortform",
+      "see_label": "Shortform Pro"
+    },
+    {
+      "title": "Report what the data supports",
+      "text": "When a strong number comes from a flawed test, I replace it and explain why.",
+      "see": "edusmartai",
+      "see_label": "EduSmartAI"
+    }
+  ],
+  "expertise": [
+    {
+      "heading": "LLM and agents",
+      "items": [
+        "LLM applications",
+        "RAG",
+        "LangGraph",
+        "LangChain",
+        "Claude API",
+        "Prompt engineering",
+        "Structured outputs",
+        "Guardrails"
+      ]
+    },
+    {
+      "heading": "Retrieval and evaluation",
+      "items": [
+        "Vector search",
+        "Embeddings",
+        "Pinecone",
+        "Qdrant",
+        "Recall@k, precision@k, MRR",
+        "Citation metrics",
+        "AWS Bedrock experiments"
+      ]
+    },
+    {
+      "heading": "Backend and integration",
+      "items": [
+        "Python",
+        "TypeScript",
+        "FastAPI",
+        "Next.js",
+        "SQL",
+        "PostgreSQL",
+        "SQLAlchemy",
+        "REST APIs",
+        "Webhooks"
+      ]
+    },
+    {
+      "heading": "Automation and delivery",
+      "items": [
+        "n8n",
+        "Celery",
+        "QStash",
+        "Docker",
+        "Git",
+        "GitHub Actions",
+        "pytest",
+        "Jest"
+      ]
+    },
+    {
+      "heading": "Machine learning and data",
+      "items": [
+        "scikit-learn",
+        "pandas",
+        "NumPy",
+        "TensorFlow",
+        "Keras",
+        "PySpark",
+        "Power BI"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "org": "Green Circle for Cybersecurity",
+      "place": "Amman, Jordan",
+      "role": "AI Engineering Intern",
+      "dates": "2026",
+      "lead": "This work is private, so I describe it at a high level.",
+      "points": [
+        "Designed and tested LLM, RAG and AI-agent workflows using Python, n8n, REST APIs and webhooks, with validation, escalation logic and human-in-the-loop controls.",
+        "Built and evaluated AWS Bedrock RAG experiments with S3-backed knowledge sources and citation-grounded test cases.",
+        "Mapped workflows with internal teams, and analyzed SOC alert investigation and reporting as an AI-assisted analyst use case."
+      ]
+    },
+    {
+      "org": "Data & AI Training Program",
+      "place": "Amman, Jordan",
+      "role": "Data & AI Trainee",
+      "dates": "2025",
+      "lead": "",
+      "points": [
+        "Applied Apache Spark and PySpark to data and machine-learning workflows, contributed to LLM and RAG application work, and built Power BI dashboards."
+      ]
+    }
+  ],
+  "education": {
+    "degree": "B.Sc. in Data Science and Artificial Intelligence",
+    "school": "Philadelphia University, Amman",
+    "year": "2026",
+    "certificates": [
+      {
+        "name": "AI Fluency for Students",
+        "issuer": "Anthropic",
+        "note": "Certificate of completion",
+        "url": "https://verify.skilljar.com/c/9hj2y5kypwrj"
+      },
+      {
+        "name": "Claude 101",
+        "issuer": "Anthropic",
+        "note": "Certificate of completion",
+        "url": "https://verify.skilljar.com/c/rpifmvjyieb2"
+      },
+      {
+        "name": "Microsoft Azure AI Fundamentals (AI-900) preparation course",
+        "issuer": "INJAZ",
+        "note": "Certificate of attendance, not the Microsoft exam",
+        "url": null
+      },
+      {
+        "name": "Data Science Full Track",
+        "issuer": "Data & AI Training Program",
+        "note": "",
+        "url": null
+      },
+      {
+        "name": "Power BI Pro & SQL",
+        "issuer": "Data & AI Training Program",
+        "note": "",
+        "url": null
+      }
+    ]
+  },
+  "evidence_labels": {
+    "ran": "Ran",
+    "code": "In code",
+    "doc": "Reported",
+    "gap": "Not done"
+  },
+  "resolved_for_release": {
+    "CV source: CV (4) is byte-identical to the 28 October CV. CV (4)(2) was not received. Facts come from that CV and verified work.": "No resume is linked from the 2026-11-14 release. Facts shown are the confirmed ones: Green Circle title and year, degree, and verified project work.",
+    "Green Circle: exact start and end months (CV: Jul-Oct 2026, LinkedIn: Sep-Nov 2026). The site shows the confirmed title and year only.": "Omitted: the site shows only the confirmed title and year.",
+    "Training provider: official spelling (Qafza Tech, Qafza.Tech or Qafzeh). The site names the program generically until confirmed.": "Omitted: the program is named generically, without provider or hours.",
+    "Private work: owner approval to describe ClientPilot AI and Shortform Pro, including Shortform's audit numbers, in public.": "Held: the ClientPilot AI and Shortform Pro case studies are not published (held_projects).",
+    "Resume: owner approval of the PDF linked from this site.": "Held: no resume PDF or link is published (cv_url is null).",
+    "EduSmartAI: whether the owner was a team member, and the reason PR #7 closed.": "Only facts visible on GitHub are stated (owner, branch, PR #7 closed without review). No team membership is claimed.",
+    "AI assistance: owner approval of the wording used in About and on the project pages.": "Kept as a truthful disclosure: the commits credit an AI coding agent. The owner may reword it.",
+    "ClientPilot AI: owner decision on the prompt that hides automation from customers.": "Held with ClientPilot AI (held_projects)."
+  },
+  "held_projects": [
+    "clientpilot",
+    "shortform"
+  ],
+  "featured": "rag-quality-lab"
+}

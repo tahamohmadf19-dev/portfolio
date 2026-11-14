@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; style-src &#x27;self&#x27;; script-src &#x27;self&#x27;; font-src &#x27;self&#x27;; img-src &#x27;self&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0B0F12">
+<title>EduSmartAI case study | Mohammad Taha Alhmad</title>
+<meta name="description" content="An academic platform needed to warn about struggling students early, but its old 0.979 score relied on data only known after a course ended.">
+<link rel="canonical" href="https://tahamohmadf19-dev.github.io/portfolio/case-studies/edusmartai.html">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="EduSmartAI case study | Mohammad Taha Alhmad">
+<meta property="og:description" content="An academic platform needed to warn about struggling students early, but its old 0.979 score relied on data only known after a course ended.">
+<meta property="og:url" content="https://tahamohmadf19-dev.github.io/portfolio/case-studies/edusmartai.html">
+<meta property="og:image" content="https://tahamohmadf19-dev.github.io/portfolio/assets/og.png">
+<meta property="og:image:alt" content="Mohammad Taha Alhmad, AI Engineer.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/source-serif-4.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/site.css?v=c9e9f7b3">
+<script src="../assets/site.js?v=fcb029c4"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="top-inner">
+    <a class="home" href="../index.html"><span class="home-full">Mohammad Taha Alhmad</span><span class="home-short" aria-hidden="true">MTA</span></a>
+    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav">
+      <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>Menu
+    </button>
+    <nav id="site-nav" aria-label="Sections">
+      <ul>
+        <li><a href="../index.html#work">Work</a></li>
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#expertise">Expertise</a></li>
+        <li><a href="../index.html#experience">Experience</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="case">
+  <section class="case-head">
+    <p class="crumb"><a class="ul" href="../index.html#edusmartai">Back to selected work</a></p>
+    <div class="project-kicker"><p class="shows">Machine learning and secure backend</p><p class="state">Unmerged contribution</p></div>
+    <h1 id="name">EduSmartAI</h1>
+    <p class="statement">An academic platform needed to warn about struggling students early, but its old 0.979 score relied on data only known after a course ended.</p>
+    <dl class="foot-facts">
+      <div><dt>Status</dt><dd>Branch not merged. PR #7 was closed with no review.</dd></div>
+      <div><dt>Source</dt><dd><a class="ul" href="https://github.com/tahamohmadf19-dev/EduSmartAI/tree/feature/prod-1" rel="noopener noreferrer">Read the branch</a></dd></div>
+      <div><dt>Stack</dt><dd>Python, FastAPI, scikit-learn, SQLAlchemy, PostgreSQL, React</dd></div>
+    </dl>
+  </section>
+  
+  <section class="case-block" data-reveal aria-labelledby="role-title">
+    <h2 id="role-title">My role</h2>
+    <p class="case-text">EduSmartAI is a graduation project by @bahaaed07706, who built and owns it. He had already documented that the old 0.979 was inflated by leakage, and he wrote the retriever. My branch builds the replacement models and the backend hardening around them. Its commits credit an AI coding agent as co-author.</p>
+  </section>
+  <section class="case-block" aria-labelledby="path-title">
+    <h2 id="path-title">How it works</h2>
+    <div class="case-text"><p>This diagram follows the real path through the code. Select a stage to read what happens there. Stages marked with a diamond <span class="legend-mark" aria-hidden="true"></span> are control points, where the system checks, stops or waits for a person.</p></div>
+    <div class="project case-panel" data-reveal><figure class="trace-wrap"><figcaption>One early-risk prediction</figcaption><ol class="trace"><li class="stage stage-store"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="edusmartai-stage-0"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Course activity</span><span class="sr">, data</span></button><div class="stage-note" id="edusmartai-stage-0"><p><span class="stage-kind">Data</span> Attendance, submissions and engagement records for each student and course.</p></div></li><li class="stage stage-gate"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="edusmartai-stage-1"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Temporal cut-off</span><span class="sr">, control point</span></button><div class="stage-note" id="edusmartai-stage-1"><p><span class="stage-kind">Control point</span> At day 14, 28 or 42, only events visible by that day are used, which avoids the leakage in the old evaluation.</p></div></li><li class="stage stage-gate"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="edusmartai-stage-2"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Group-aware validation</span><span class="sr">, control point</span></button><div class="stage-note" id="edusmartai-stage-2"><p><span class="stage-kind">Control point</span> StratifiedGroupKFold keeps each student on one side of every split, with a temporal holdout and bootstrap confidence intervals.</p></div></li><li class="stage stage-step"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="edusmartai-stage-3"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Early-risk model</span><span class="sr">, step</span></button><div class="stage-note" id="edusmartai-stage-3"><p><span class="stage-kind">Step</span> A scikit-learn pipeline per cut-off, trained so that scaling and encoding happen inside each fold.</p></div></li><li class="stage stage-gate"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="edusmartai-stage-4"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Train-serve parity</span><span class="sr">, control point</span></button><div class="stage-note" id="edusmartai-stage-4"><p><span class="stage-kind">Control point</span> Training and serving share one feature module, and tests check that they produce the same features.</p></div></li><li class="stage stage-step"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="edusmartai-stage-5"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Explanation</span><span class="sr">, step</span></button><div class="stage-note" id="edusmartai-stage-5"><p><span class="stage-kind">Step</span> Deterministic, rule-based explanations of which signals drove a prediction, with no model-generated text.</p></div></li><li class="stage stage-step"><button type="button" class="stage-btn" aria-expanded="false" aria-controls="edusmartai-stage-6"><span class="stage-mark" aria-hidden="true"></span><span class="stage-name">Intervention</span><span class="sr">, step</span></button><div class="stage-note" id="edusmartai-stage-6"><p><span class="stage-kind">Step</span> Staff can record and track actions taken for a flagged student.</p></div></li></ol></figure></div>
+  </section>
+  <section class="case-block" data-reveal aria-labelledby="decisions-title">
+    <h2 id="decisions-title">Engineering decisions</h2>
+    <ul class="case-list"><li>Reported that the day-14 model is close to chance, and called it insufficient for operational use, instead of tuning until it looked better.</li><li>Built replacement models after the project owner documented the leakage in the old 0.979.</li><li>Added server-side token revocation, audit logging and rate limiting to the backend.</li><li>Added a bilingual held-out RAG evaluation, Arabic right-to-left support and accessibility work.</li></ul>
+  </section>
+  <section class="case-block" data-reveal aria-labelledby="tested-title">
+    <h2 id="tested-title">What was tested</h2>
+    <ul class="case-list"><li>Retrained with scripts/train_early_risk.py on 2026-11-07.</li><li>ROC-AUC by cut-off: day 14, 0.5657. Day 28, 0.6769. Day 42, 0.7288.</li><li>Accuracy by cut-off: day 14, 0.5536. Day 28, 0.6444. Day 42, 0.6844.</li><li>Backend suite: 220 passed, 3 skipped, at commit 73583aa.</li></ul>
+  </section>
+  <section class="case-block" data-reveal aria-labelledby="limits-title">
+    <h2 id="limits-title">Limits and open work</h2>
+    <ul class="case-list"><li>The legacy 0.979 could not be reproduced, because a source file is not in the repository.</li><li>The branch is not part of the project&#x27;s main branch.</li><li>The retriever is by the project owner, and it is lexical, not semantic.</li><li>Live LLM answer quality was not evaluated. Frontend tests and the live PostgreSQL integration were not run.</li></ul>
+  </section>
+</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <p>Mohammad Taha Alhmad, AI Engineer</p>
+    <a class="ul" href="#main">Back to top</a>
+  </div>
+</footer>
+</body>
+</html>

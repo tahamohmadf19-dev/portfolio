@@ -1,872 +1,208 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mohammad Taha — Data Science & AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #060b14;
-  --bg2: #0a1120;
-  --bg3: #0f1928;
-  --surface: #111e30;
-  --surface2: #162438;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.1);
-  --cyan: #00d4ff;
-  --cyan2: #00a8cc;
-  --amber: #f0b429;
-  --amber2: #d49500;
-  --green: #00e5a0;
-  --text: #e8f0f8;
-  --text2: #8ba0b8;
-  --text3: #4a6070;
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--cyan2) var(--bg2)}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--cyan2);border-radius:3px}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.6;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
-img{max-width:100%}
-::selection{background:rgba(0,212,255,0.25);color:#fff}
-
-#canvas-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.4}
-
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;height:70px;display:flex;align-items:center;justify-content:space-between;transition:all 0.3s}
-nav.scrolled{background:rgba(6,11,20,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{font-family:var(--font-display);font-size:1.1rem;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:10px}
-.nav-logo span{color:var(--cyan)}
-.nav-dot{width:8px;height:8px;background:var(--amber);border-radius:50%;animation:pulse-dot 2s infinite}
-@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
-.nav-links{display:flex;align-items:center;gap:32px}
-.nav-links a{font-family:var(--font-mono);font-size:0.75rem;font-weight:500;color:var(--text2);letter-spacing:0.5px;transition:color 0.2s;position:relative}
-.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--cyan);transition:width 0.3s}
-.nav-links a:hover{color:var(--cyan)}
-.nav-links a:hover::after{width:100%}
-.nav-btn{background:transparent;border:1px solid var(--amber);color:var(--amber);font-family:var(--font-mono);font-size:0.72rem;font-weight:700;padding:8px 18px;border-radius:4px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s}
-.nav-btn:hover{background:var(--amber);color:var(--bg)}
-
-#hero{min-height:100vh;display:flex;align-items:center;padding:120px 5% 80px;position:relative;z-index:1}
-.hero-grid{display:grid;grid-template-columns:1fr 420px;gap:80px;align-items:center;width:100%;max-width:1200px;margin:0 auto}
-.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:20px;padding:6px 14px;font-family:var(--font-mono);font-size:0.72rem;color:var(--cyan);margin-bottom:28px;letter-spacing:0.5px}
-.hero-tag-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse-dot 2s infinite}
-.hero-name{font-family:var(--font-display);font-size:clamp(2.8rem,5vw,4.2rem);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:8px}
-.hero-name span{color:var(--cyan)}
-.hero-title{font-family:var(--font-mono);font-size:1rem;color:var(--amber);margin-bottom:24px;display:flex;align-items:center;gap:8px;font-weight:500}
-.cursor-blink{display:inline-block;width:2px;height:1em;background:var(--amber);animation:blink 1s infinite;vertical-align:text-bottom}
-@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
-.hero-bio{font-size:1.05rem;color:var(--text2);line-height:1.75;max-width:560px;margin-bottom:40px}
-.hero-bio strong{color:var(--text)}
-.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:56px}
-.btn-primary{background:var(--cyan);color:var(--bg);font-family:var(--font-display);font-weight:700;font-size:0.9rem;padding:13px 28px;border-radius:4px;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:-0.2px}
-.btn-primary:hover{background:var(--cyan2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,212,255,0.3)}
-.btn-ghost{background:transparent;color:var(--text);font-family:var(--font-display);font-weight:600;font-size:0.9rem;padding:12px 24px;border-radius:4px;border:1px solid var(--border2);cursor:pointer;transition:all 0.2s}
-.btn-ghost:hover{border-color:var(--text2);background:rgba(255,255,255,0.04)}
-.hero-meta{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
-.hero-meta-item{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:0.72rem;color:var(--text3)}
-.hero-meta-item svg{color:var(--cyan);flex-shrink:0}
-.hero-meta-item a:hover{color:var(--cyan)}
-
-.hero-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden;position:relative}
-.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--amber),var(--green));z-index:2}
-.hero-card-img{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,#0d1e35 0%,#162438 50%,#0a1624 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.hero-card-img-placeholder{
-  width:210px;
-  height:210px;
-  border-radius:50%;
-  object-fit:cover;
-  border:3px solid rgba(0,212,255,0.3);
-  position:relative;
-  z-index:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:var(--font-display);
-  font-size:3.5rem;
-  font-weight:800;
-  color:#fff;
-  letter-spacing:-2px;
-  background:linear-gradient(135deg,var(--cyan2),#0066aa);
-}
-.hero-card-img-ring{position:absolute;width:240px;height:240px;border-radius:50%;border:1px dashed rgba(0,212,255,0.2);animation:spin-ring 20s linear infinite}
-.hero-card-img-ring2{position:absolute;width:290px;height:290px;border-radius:50%;border:1px dashed rgba(0,212,255,0.1);animation:spin-ring 30s linear infinite reverse}
-@keyframes spin-ring{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-
-.hero-card-body{padding:24px}
-.hero-card-name{font-family:var(--font-display);font-size:1.1rem;font-weight:800;margin-bottom:2px}
-.hero-card-role{font-family:var(--font-mono);font-size:0.72rem;color:var(--amber);margin-bottom:18px}
-.hero-card-info{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
-.hero-card-info-item{display:flex;align-items:center;gap:10px;font-size:0.85rem;color:var(--text2)}
-.hero-card-info-icon{width:30px;height:30px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.hero-card-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.hcb{padding:10px;border-radius:8px;font-family:var(--font-mono);font-size:0.72rem;font-weight:700;letter-spacing:0.3px;cursor:pointer;transition:all 0.2s;text-align:center;border:none}
-.hcb-primary{background:var(--amber);color:var(--bg)}
-.hcb-primary:hover{background:var(--amber2)}
-.hcb-ghost{background:transparent;border:1px solid var(--border2);color:var(--text)}
-.hcb-ghost:hover{border-color:var(--text2)}
-
-section{padding:100px 5%;position:relative;z-index:1}
-.section-label{font-family:var(--font-mono);font-size:0.72rem;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.section-label::before{content:'';width:30px;height:1px;background:var(--cyan)}
-.section-title{font-family:var(--font-display);font-size:clamp(1.8rem,3vw,2.6rem);font-weight:800;letter-spacing:-1px;margin-bottom:12px}
-.section-sub{color:var(--text2);font-size:1rem;max-width:600px;margin-bottom:56px}
-.inner{max-width:1200px;margin:0 auto}
-
-#about .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px}
-.about-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;position:relative;overflow:hidden;transition:border-color 0.3s}
-.about-card:hover{border-color:var(--border2)}
-.about-card-accent{position:absolute;top:0;left:0;width:100%;height:3px}
-.about-card-accent.cyan{background:linear-gradient(90deg,var(--cyan),transparent)}
-.about-card-accent.amber{background:linear-gradient(90deg,var(--amber),transparent)}
-.about-card h3{font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.about-card ul{list-style:none;display:flex;flex-direction:column;gap:10px}
-.about-card ul li{display:flex;align-items:flex-start;gap:10px;color:var(--text2);font-size:0.92rem}
-.about-card ul li::before{content:'→';color:var(--cyan);font-family:var(--font-mono);flex-shrink:0;margin-top:1px}
-.about-bio{font-size:1rem;color:var(--text2);line-height:1.8;margin-bottom:40px}
-.about-bio strong{color:var(--text)}
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
-.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;position:relative;overflow:hidden;transition:all 0.3s}
-.stat-box:hover{border-color:rgba(0,212,255,0.2);transform:translateY(-2px)}
-.stat-box::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity 0.3s}
-.stat-box:hover::after{opacity:1}
-.stat-num{font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--cyan);line-height:1;margin-bottom:4px}
-.stat-label{font-family:var(--font-mono);font-size:0.68rem;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase}
-
-#skills{background:var(--bg2)}
-.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.skill-cat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;transition:border-color 0.3s}
-.skill-cat:hover{border-color:rgba(0,212,255,0.2)}
-.skill-cat-title{font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-bottom:18px;display:flex;align-items:center;gap:10px}
-.skill-cat-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-.skill-tags{display:flex;flex-wrap:wrap;gap:7px}
-.skill-tag{font-family:var(--font-mono);font-size:0.68rem;padding:5px 10px;border-radius:4px;border:1px solid var(--border2);color:var(--text2);font-weight:500;transition:all 0.2s;cursor:default}
-.skill-tag:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,0.05)}
-.skill-tag.featured{border-color:rgba(0,212,255,0.3);color:var(--cyan);background:rgba(0,212,255,0.06)}
-
-.projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.project-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative;overflow:hidden;transition:all 0.3s;cursor:pointer}
-.project-card:hover{border-color:rgba(0,212,255,0.25);transform:translateY(-3px);box-shadow:0 20px 40px rgba(0,0,0,0.4)}
-.project-card::after{content:'';position:absolute;top:0;right:0;width:100px;height:100px;background:radial-gradient(circle,rgba(0,212,255,0.06),transparent 70%);opacity:0;transition:opacity 0.3s}
-.project-card:hover::after{opacity:1}
-.project-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
-.project-badge{font-family:var(--font-mono);font-size:0.65rem;padding:4px 10px;border-radius:20px;font-weight:600;letter-spacing:0.3px}
-.badge-blue{background:rgba(0,100,200,0.2);color:#4da6ff;border:1px solid rgba(0,100,200,0.3)}
-.badge-green{background:rgba(0,180,100,0.15);color:#00e08a;border:1px solid rgba(0,180,100,0.25)}
-.badge-amber{background:rgba(240,180,40,0.15);color:#f0b429;border:1px solid rgba(240,180,40,0.25)}
-.badge-cyan{background:rgba(0,212,255,0.12);color:var(--cyan);border:1px solid rgba(0,212,255,0.2)}
-.project-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.project-name{font-family:var(--font-display);font-size:1.15rem;font-weight:700;margin-bottom:8px;letter-spacing:-0.3px}
-.project-desc{color:var(--text2);font-size:0.88rem;line-height:1.65;margin-bottom:16px}
-.project-bullets{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
-.project-bullets li{display:flex;align-items:flex-start;gap:8px;color:var(--text2);font-size:0.82rem;line-height:1.5}
-.project-bullets li::before{content:'▸';color:var(--cyan);flex-shrink:0;font-size:0.7rem;margin-top:3px}
-.project-tech{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
-.tech-tag{font-family:var(--font-mono);font-size:0.64rem;padding:3px 8px;border-radius:3px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text3);font-weight:500}
-.project-metric{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:20px;padding:4px 12px;font-family:var(--font-mono);font-size:0.7rem;color:var(--green);font-weight:600}
-.project-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-.project-link{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;font-family:var(--font-mono);font-size:0.68rem;font-weight:700;letter-spacing:0.3px;transition:all 0.2s}
-.project-link.primary{background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);color:var(--cyan)}
-.project-link.primary:hover{background:rgba(0,212,255,0.16);transform:translateY(-1px)}
-.project-link.ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
-.project-link.ghost:hover{border-color:var(--text2);color:var(--text)}
-
-#experience{background:var(--bg2)}
-.timeline{position:relative;padding-right:20px}
-.timeline::before{content:'';position:absolute;right:0;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,var(--cyan),var(--amber),transparent)}
-.timeline-item{position:relative;padding-right:32px;margin-bottom:40px}
-.timeline-dot{position:absolute;right:-6px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--cyan);z-index:1}
-.timeline-item:nth-child(2) .timeline-dot{border-color:var(--amber)}
-.timeline-date{font-family:var(--font-mono);font-size:0.7rem;color:var(--cyan);letter-spacing:0.5px;margin-bottom:8px;font-weight:500}
-.timeline-item:nth-child(2) .timeline-date{color:var(--amber)}
-.timeline-role{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:4px}
-.timeline-company{color:var(--text2);font-size:0.9rem;margin-bottom:14px}
-.timeline-list{list-style:none;display:flex;flex-direction:column;gap:8px}
-.timeline-list li{display:flex;align-items:flex-start;gap:8px;color:var(--text2);font-size:0.88rem}
-.timeline-list li::before{content:'→';color:var(--cyan);font-family:var(--font-mono);flex-shrink:0;font-size:0.75rem;margin-top:2px}
-.exp-aside{position:sticky;top:90px}
-.edu-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
-.edu-card::before{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:var(--cyan)}
-.edu-degree{font-family:var(--font-display);font-size:0.95rem;font-weight:700;margin-bottom:4px}
-.edu-univ{color:var(--amber);font-size:0.85rem;font-weight:600;margin-bottom:4px}
-.edu-detail{color:var(--text3);font-family:var(--font-mono);font-size:0.72rem}
-.exp-grid{display:grid;grid-template-columns:1fr 320px;gap:56px;align-items:start}
-
-.cred-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.cred-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;transition:all 0.3s}
-.cred-card:hover{border-color:rgba(240,180,40,0.3);transform:translateY(-2px)}
-.cred-icon{font-size:1.8rem;margin-bottom:12px}
-.cred-name{font-family:var(--font-display);font-size:0.9rem;font-weight:700;margin-bottom:4px}
-.cred-issuer{font-family:var(--font-mono);font-size:0.7rem;color:var(--amber);margin-bottom:8px}
-.cred-year{font-family:var(--font-mono);font-size:0.68rem;color:var(--text3)}
-
-#contact{background:var(--bg2)}
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
-.contact-info{display:flex;flex-direction:column;gap:14px;margin-bottom:36px}
-.contact-item{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;transition:all 0.3s}
-.contact-item:hover{border-color:rgba(0,212,255,0.2)}
-.contact-icon{width:40px;height:40px;border-radius:8px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.contact-item-label{font-family:var(--font-mono);font-size:0.65rem;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:2px}
-.contact-item-val{font-size:0.9rem;color:var(--text);font-weight:500}
-.contact-form{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px}
-.form-group{margin-bottom:18px}
-.form-label{font-family:var(--font-mono);font-size:0.7rem;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:7px;display:block}
-.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text);font-family:var(--font-body);font-size:0.9rem;transition:border-color 0.2s;resize:none}
-.form-input:focus{outline:none;border-color:rgba(0,212,255,0.4);background:var(--bg2)}
-.form-input::placeholder{color:var(--text3)}
-.form-btn{width:100%;background:var(--cyan);color:var(--bg);font-family:var(--font-display);font-weight:700;font-size:0.95rem;padding:14px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:-0.2px}
-.form-btn:hover{background:var(--cyan2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,212,255,0.25)}
-
-footer{padding:32px 5%;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
-.footer-copy{font-family:var(--font-mono);font-size:0.7rem;color:var(--text3)}
-.footer-links{display:flex;gap:20px}
-.footer-links a{font-family:var(--font-mono);font-size:0.7rem;color:var(--text3);transition:color 0.2s}
-.footer-links a:hover{color:var(--cyan)}
-
-.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-delay-1{transition-delay:0.1s}
-.reveal-delay-2{transition-delay:0.2s}
-.reveal-delay-3{transition-delay:0.3s}
-.reveal-delay-4{transition-delay:0.4s}
-
-@media(max-width:900px){
-  .hero-grid,.about-grid,.contact-grid,.exp-grid{grid-template-columns:1fr}
-  .skills-grid,.projects-grid,.cred-grid{grid-template-columns:1fr}
-  .stats-row{grid-template-columns:repeat(3,1fr)}
-  .hero-card{max-width:380px}
-  .nav-links{display:none}
-}
-
-.glitch{position:relative}
-.glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%;clip-path:polygon(0 0,100% 0,100% 33%,0 33%)}
-.glitch::before{color:var(--cyan);transform:translate(-2px,0);opacity:0;animation:glitch1 4s infinite 2s}
-.glitch::after{color:var(--amber);transform:translate(2px,0);opacity:0;animation:glitch2 4s infinite 2.1s}
-@keyframes glitch1{0%,95%,100%{opacity:0;transform:translate(-2px,0)}96%{opacity:0.8;transform:translate(-3px,-1px)}}
-@keyframes glitch2{0%,95%,100%{opacity:0;transform:translate(2px,0)}96%{opacity:0.8;transform:translate(3px,1px)}}
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; style-src &#x27;self&#x27;; script-src &#x27;self&#x27;; font-src &#x27;self&#x27;; img-src &#x27;self&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0B0F12">
+<title>Mohammad Taha Alhmad | AI Engineer</title>
+<meta name="description" content="Mohammad Taha Alhmad is an AI Engineer in Amman building LLM applications, RAG evaluation, agent workflows and backend integrations. Each project states what was built, what was tested and what is unfinished.">
+<link rel="canonical" href="https://tahamohmadf19-dev.github.io/portfolio/">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Mohammad Taha Alhmad | AI Engineer">
+<meta property="og:description" content="Mohammad Taha Alhmad is an AI Engineer in Amman building LLM applications, RAG evaluation, agent workflows and backend integrations. Each project states what was built, what was tested and what is unfinished.">
+<meta property="og:url" content="https://tahamohmadf19-dev.github.io/portfolio/">
+<meta property="og:image" content="https://tahamohmadf19-dev.github.io/portfolio/assets/og.png">
+<meta property="og:image:alt" content="Mohammad Taha Alhmad, AI Engineer.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/source-serif-4.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css?v=c9e9f7b3">
+<script src="assets/site.js?v=fcb029c4"></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Mohammad Taha Alhmad", "jobTitle": "AI Engineer", "url": "https://tahamohmadf19-dev.github.io/portfolio/", "email": "mailto:tahamohmadf19@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Amman", "addressCountry": "JO"}, "alumniOf": {"@type": "CollegeOrUniversity", "name": "Philadelphia University"}, "sameAs": ["https://github.com/tahamohmadf19-dev", "https://www.linkedin.com/in/mohmad-taha-alhmad/", "https://www.kaggle.com/tahamohmad"]}</script>
 </head>
 <body>
-
-<canvas id="canvas-bg"></canvas>
-
-<nav id="navbar">
-  <div class="nav-logo">
-    <div class="nav-dot"></div>
-    <span>MT</span>Alhmad
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="top-inner">
+    <a class="home" href="#main"><span class="home-full">Mohammad Taha Alhmad</span><span class="home-short" aria-hidden="true">MTA</span></a>
+    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav">
+      <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>Menu
+    </button>
+    <nav id="site-nav" aria-label="Sections">
+      <ul>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#expertise">Expertise</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
   </div>
-  <div class="nav-links">
-    <a href="#about">About</a>
-    <a href="#skills">Skills</a>
-    <a href="#projects">Projects</a>
-    <a href="#experience">Experience</a>
-    <a href="#credentials">Credentials</a>
-    <a href="#contact">Contact</a>
-  </div>
-  <a href="#" onclick="downloadCV()" class="nav-btn">Download CV</a>
-</nav>
+</header>
 
-<section id="hero">
-  <div class="hero-grid">
-    <div>
-      <div class="hero-tag">
-        <div class="hero-tag-dot"></div>
-        Available for Internships · 2025
-      </div>
-      <h1 class="hero-name glitch" data-text="Mohammad Taha">
-        Mohammad <span>Taha</span>
-      </h1>
-      <div class="hero-title">
-        <span id="typed-title">Data Science & AI Engineer · LLM Engineer · Big Data Engineer</span>
-        <span class="cursor-blink"></span>
-      </div>
-      <p class="hero-bio">
-        4th-year <strong>Data Science & AI Engineer</strong> at Philadelphia University, Amman.
-        Building end-to-end ML pipelines, <strong>big data solutions with Apache Spark</strong>,
-        and modern AI applications using <strong>RAG, LangChain, and LangGraph</strong>.
-        I enjoy turning raw data into intelligent systems and I am still continuously developing myself to become a stronger AI engineer.
-      </p>
-      <div class="hero-cta">
-        <a href="#projects" class="btn-primary">View Projects</a>
-        <a href="#contact" class="btn-ghost">Contact Me</a>
-        <a href="https://github.com/tahamohmadf19-dev" target="_blank" class="btn-ghost">GitHub ↗</a>
-      </div>
-      <div class="hero-meta">
-        <div class="hero-meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Amman, Jordan
+<main id="main">
+  <section class="hero" aria-labelledby="name">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="hero-id">
+          <h1 id="name" class="enter d1">Mohammad Taha Alhmad</h1>
+          <p class="role enter d2">AI Engineer</p>
         </div>
-        <div class="hero-meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <a href="mailto:tahamohmadf19@gmail.com">tahamohmadf19@gmail.com</a>
-        </div>
-        <div class="hero-meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-          <a href="https://linkedin.com/in/mohmad-taha-alhmad" target="_blank">LinkedIn</a>
-        </div>
-        <div class="hero-meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
-          <a href="https://github.com/tahamohmadf19-dev" target="_blank">GitHub</a>
-        </div>
-        <div class="hero-meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.5 7.5h-2c-.4 0-.5.2-.5.5v1.5h2.5l-.3 2.5H15V18h-3v-6.5h-1.5V9H12V7.5c0-2 1.2-3 3-3h2.5V7.5z"/></svg>
-          <a href="https://kaggle.com/tahamohmadf19" target="_blank">Kaggle</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="hero-card reveal">
-      <div class="hero-card-img">
-        <div class="hero-card-img-ring"></div>
-        <div class="hero-card-img-ring2"></div>
-        <img src="WhatsApp Image 2025-09-28 at 1.17.18 PM.jpeg" alt="Mohammad Taha" class="hero-card-img-placeholder"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div style="display:none;width:210px;height:210px;border-radius:50%;background:linear-gradient(135deg,var(--cyan2),#0066aa);align-items:center;justify-content:center;font-family:var(--font-display);font-size:3.5rem;font-weight:800;color:#fff;position:relative;z-index:1">MT</div>
-      </div>
-      <div class="hero-card-body">
-        <div class="hero-card-name">Mohammad Taha Alhmad</div>
-        <div class="hero-card-role">// Data Science & AI Engineer</div>
-        <div class="hero-card-info">
-          <div class="hero-card-info-item">
-            <div class="hero-card-info-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><rect x="3" y="4" width="20" height="22" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            tahamohmadf19@gmail.com
-          </div>
-          <div class="hero-card-info-item">
-            <div class="hero-card-info-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 01.98 2.18 2 2 0 012.96 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0121.22 14z"/></svg>
-            </div>
-            +962 78149 9491
-          </div>
-          <div class="hero-card-info-item">
-            <div class="hero-card-info-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-            Amman, Jordan
-          </div>
-          <div class="hero-card-info-item">
-            <div class="hero-card-info-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-            </div>
-            mohmad-taha-alhmad
-          </div>
-        </div>
-        <div class="hero-card-btns">
-          <a href="#" onclick="downloadCV()" class="hcb hcb-primary">Open CV</a>
-          <a href="https://github.com/tahamohmadf19-dev" target="_blank" class="hcb hcb-ghost">GitHub</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="about">
-  <div class="inner">
-    <div class="section-label reveal">001 — About</div>
-    <h2 class="section-title reveal">Who I Am</h2>
-    <div class="stats-row reveal">
-      <div class="stat-box">
-        <div class="stat-num" data-count="5">0</div>
-        <div class="stat-label">AI & Data Projects</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" data-count="90">0</div>
-        <div class="stat-label" style="display:flex;align-items:center;justify-content:center;gap:2px">Best Accuracy <span style="color:var(--text3);font-size:0.6rem">%</span></div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" data-count="4">0</div>
-        <div class="stat-label">Years Study</div>
-      </div>
-    </div>
-    <p class="about-bio reveal">
-      I'm a <strong>Data Science and Artificial Intelligence</strong> student who learns quickly, adapts to new environments, and enjoys contributing through volunteering. Outside of tech, I'm a hiker — building discipline, resilience, and a growth mindset. I've worked on end-to-end data projects covering <strong>classification, regression, big data with Apache Spark, dashboards, RAG pipelines, and AI agent systems</strong>. I am still continuously developing myself, learning modern tools and building practical projects to become the best version of myself in <strong>AI, data science, and big data engineering</strong>.
-    </p>
-    <div class="about-grid">
-      <div class="about-card reveal reveal-delay-1">
-        <div class="about-card-accent cyan"></div>
-        <h3>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          What I'm Looking For
-        </h3>
-        <ul>
-          <li>Internship roles in Data Science, AI Engineering, LLM Engineering, or Big Data</li>
-          <li>Teams that value experimentation, clean engineering, and measurable impact</li>
-          <li>Projects where I can contribute end-to-end: data, modeling, evaluation, deployment, and intelligent AI workflows</li>
+        <p class="statement enter d3">I design and build practical AI systems, intelligent automation, LLM applications and backend integrations.</p>
+        <ul class="actions enter d4">
+          <li><a class="btn btn-primary" href="#work">View selected work <span class="btn-arrow" aria-hidden="true">&rarr;</span></a></li>
+          
         </ul>
+        <ul class="hero-links enter d5"><li><a class="ul" href="https://github.com/tahamohmadf19-dev" rel="noopener noreferrer">GitHub</a></li><li><a class="ul" href="https://www.linkedin.com/in/mohmad-taha-alhmad/" rel="noopener noreferrer">LinkedIn</a></li><li><a class="ul" href="https://www.kaggle.com/tahamohmad" rel="noopener noreferrer">Kaggle</a></li><li><a class="ul" href="mailto:tahamohmadf19@gmail.com">Email</a></li></ul>
+        <ul class="stack-line enter d6" aria-label="Main technologies"><li>Python</li><li>FastAPI</li><li>TypeScript</li><li>LangGraph</li><li>RAG</li><li>Pinecone</li><li>Qdrant</li><li>AWS Bedrock</li><li>n8n</li></ul>
       </div>
-      <div class="about-card reveal reveal-delay-2">
-        <div class="about-card-accent amber"></div>
-        <h3>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
-          What You Can Expect
-        </h3>
-        <ul>
-          <li>Strong fundamentals in algorithms, databases, ML/DL, NLP, and big data processing</li>
-          <li>Hands-on experience building AI systems with RAG, LangChain, LangGraph, and Apache Spark</li>
-          <li>High ownership, clear communication, and continuous self-development</li>
+      <div class="portrait">
+        <div class="frame"><picture><source type="image/webp" srcset="assets/photo/portrait-320.2c9739b4.webp 320w, assets/photo/portrait-410.2c9739b4.webp 410w" sizes="(max-width: 640px) calc(100vw - 58px), (max-width: 960px) 34vw, 346px"><img src="assets/photo/portrait-410.2c9739b4.jpg" srcset="assets/photo/portrait-320.2c9739b4.jpg 320w, assets/photo/portrait-410.2c9739b4.jpg 410w" sizes="(max-width: 640px) calc(100vw - 58px), (max-width: 960px) 34vw, 346px" width="410" height="512" alt="Portrait of Mohammad Taha Alhmad" fetchpriority="high"></picture></div>
+        <p class="hero-note enter d6">Amman, Jordan</p>
+      </div>
+      <figure class="path enter d7"><figcaption><span>One evaluation run in RAG Quality Lab, a prototype</span><a class="ul" href="#rag-quality-lab">See how it works</a></figcaption><div class="path-track"><ol><li class="stage-store"><span class="path-mark" aria-hidden="true"></span><span class="path-name">Dataset version</span></li><li class="stage-step"><span class="path-mark" aria-hidden="true"></span><span class="path-name">Background run</span></li><li class="stage-step"><span class="path-mark" aria-hidden="true"></span><span class="path-name">Chat pipeline</span></li><li class="stage-step"><span class="path-mark" aria-hidden="true"></span><span class="path-name">Deterministic metrics</span></li><li class="stage-gate"><span class="path-mark" aria-hidden="true"></span><span class="path-name">Optional LLM judge</span></li><li class="stage-gate"><span class="path-mark" aria-hidden="true"></span><span class="path-name">Aggregate</span></li><li class="stage-step"><span class="path-mark" aria-hidden="true"></span><span class="path-name">Review</span></li></ol><span class="path-pulse" aria-hidden="true"></span></div></figure>
+    </div>
+    <nav class="index enter d7" aria-label="Selected projects">
+      <p class="index-title">Selected systems</p>
+      <ul><li><a href="#rag-quality-lab"><span class="index-name">RAG Quality Lab</span><span class="index-shows">RAG evaluation</span></a></li><li><a href="#edusmartai"><span class="index-name">EduSmartAI</span><span class="index-shows">Machine learning and secure backend</span></a></li></ul>
+    </nav>
+  </section>
+
+  <section id="work" class="work" aria-labelledby="work-title">
+    <div class="section-head" data-reveal>
+      <h2 id="work-title">Selected work</h2>
+      <div class="section-note">
+        <p>Each project states the problem, what I built, what works, and how far it has been tested. All two are prototypes or unfinished contributions, not deployed products.</p>
+        <ul class="legend">
+          <li><span class="tag tag-ran">Ran</span> Executed on 2026-11-07, or as stated.</li>
+          <li><span class="tag tag-code">In code</span> Confirmed by reading the code, not run.</li>
+          <li><span class="tag tag-gap">Not done</span> Not yet done or not verified.</li>
         </ul>
       </div>
     </div>
-  </div>
-</section>
+    
+    <article class="project" data-reveal id="rag-quality-lab" aria-labelledby="rag-quality-lab-name">
+      <header class="project-head">
+        <div class="project-kicker"><p class="shows">RAG evaluation</p><p class="state">Prototype</p></div>
+        <h3 id="rag-quality-lab-name">RAG Quality Lab</h3>
+        <p class="purpose">When a team changes a RAG system, it is hard to tell whether answers improved, or why one answer cited the wrong source.</p>
+      </header>
+      
+      <div class="cells">
+        <section class="cell" aria-label="What I built in RAG Quality Lab"><h4>What I built</h4><ul><li>An evaluation and debugging layer added to Onyx Community Edition, an open-source RAG platform.</li><li>Versioned test datasets, background runs and saved results for each test case.</li><li>Six retrieval and citation metrics, plus an optional LLM judge that cannot change them.</li><li>An admin dashboard, a read-only retrieval debugger, and rule-based checks for risky text in ingested documents.</li></ul></section>
+        <section class="cell" aria-label="What works in RAG Quality Lab"><h4>What works</h4><ul><li>Metrics leave a value undefined when it cannot be measured, instead of counting it as zero.</li><li>A failed test case is saved and the run continues.</li><li>If the judge fails, the case still succeeds with an empty judge score.</li></ul></section>
+        <section class="cell" aria-label="Architecture of RAG Quality Lab"><h4>Architecture and stack</h4><p>Python and FastAPI services inside Onyx, Celery for background runs, SQLAlchemy migrations, and React admin pages.</p><p class="stack">Python, FastAPI, Celery, SQLAlchemy, Pydantic, TypeScript, React</p></section>
+        <section class="cell" aria-label="Evidence for RAG Quality Lab"><h4>Evidence</h4><ul class="evidence"><li><span class="tag tag-ran">Ran</span> All 411 unit tests I added passed on 2026-11-07: 236 backend and 175 frontend, with the database, LLM and task broker replaced by fakes.</li><li><span class="tag tag-code">In code</span> Migrations, API routes and dashboard pages are in the code. The pages have not been viewed running.</li><li><span class="tag tag-gap">Not done</span> Not run end to end, and not evaluated on a real document collection.</li></ul></section>
+      </div>
+      <footer class="project-foot">
+        <dl class="foot-facts">
+          <div><dt>Status</dt><dd>Prototype, not deployed.</dd></div>
+          <div><dt>Source</dt><dd>Private repository. Walkthrough on request.</dd></div>
+        </dl>
+        <a class="btn" href="case-studies/rag-quality-lab.html">Read the case study <span class="btn-arrow" aria-hidden="true">&rarr;</span></a>
+      </footer>
+    </article>
+    <article class="project" data-reveal id="edusmartai" aria-labelledby="edusmartai-name">
+      <header class="project-head">
+        <div class="project-kicker"><p class="shows">Machine learning and secure backend</p><p class="state">Unmerged contribution</p></div>
+        <h3 id="edusmartai-name">EduSmartAI</h3>
+        <p class="purpose">An academic platform needed to warn about struggling students early, but its old 0.979 score relied on data only known after a course ended.</p>
+      </header>
+      
+      <div class="cells">
+        <section class="cell" aria-label="What I built in EduSmartAI"><h4>What I built</h4><ul><li>On a branch of a graduation project by @bahaaed07706: early-risk models for day 14, 28 and 42, using only data visible by that day.</li><li>Student-grouped validation, a temporal holdout and confidence intervals.</li><li>Shared feature code for training and serving, rule-based explanations and intervention tracking.</li><li>Token revocation, audit logging, rate limiting, and a PostgreSQL path.</li></ul></section>
+        <section class="cell" aria-label="What works in EduSmartAI"><h4>What works</h4><ul><li>Models retrained from the branch reproduce its reported results.</li><li>ROC-AUC rises from 0.566 at day 14, close to chance, to 0.729 at day 42.</li><li>Backend security, intervention and serving behavior pass their tests.</li></ul></section>
+        <section class="cell" aria-label="Architecture of EduSmartAI"><h4>Architecture and stack</h4><p>FastAPI and SQLAlchemy backend, scikit-learn pipelines per cut-off, and a React frontend with Arabic and English.</p><p class="stack">Python, FastAPI, scikit-learn, SQLAlchemy, PostgreSQL, React</p></section>
+        <section class="cell" aria-label="Evidence for EduSmartAI"><h4>Evidence</h4><ul class="evidence"><li><span class="tag tag-ran">Ran</span> Retrained on 2026-11-07: ROC-AUC 0.566, 0.677 and 0.729, matching the report.</li><li><span class="tag tag-ran">Ran</span> Backend tests: 220 passed, 3 skipped, at commit 73583aa.</li><li><span class="tag tag-code">In code</span> Frontend tests and the live PostgreSQL integration were not run.</li></ul></section>
+      </div>
+      <footer class="project-foot">
+        <dl class="foot-facts">
+          <div><dt>Status</dt><dd>Branch not merged. PR #7 was closed with no review.</dd></div>
+          <div><dt>Source</dt><dd><a class="ul" href="https://github.com/tahamohmadf19-dev/EduSmartAI/tree/feature/prod-1" rel="noopener noreferrer">Read the branch</a></dd></div>
+        </dl>
+        <a class="btn" href="case-studies/edusmartai.html">Read the case study <span class="btn-arrow" aria-hidden="true">&rarr;</span></a>
+      </footer>
+    </article>
+    <div class="more" data-reveal>
+      <h3>Smaller public projects</h3>
+      <ul><li><figure class="media"><img src="assets/evidence/rag-document-search-answer.webp" width="900" height="618" alt="The RAG Document Search interface answering a question about a warranty from a sample PDF, with page citations." loading="lazy"><figcaption>A real local run on a sample PDF.</figcaption></figure><a class="more-name ul" href="https://github.com/tahamohmadf19-dev/rag-document-search" rel="noopener noreferrer">RAG Document Search</a><p>Upload a PDF, ask a question, and get an extracted sentence with page citations. It uses Qdrant and local lexical embeddings, with no LLM.</p><p class="more-evidence"><span class="tag tag-ran">Ran</span> 26 tests pass. On 4 short synthetic documents: 14 of 14 answers correct and 5 of 5 unanswerable questions declined; on 8 held-out questions, 4 of 4 unrelated ones declined and 3 of 4 answered. It can refuse paraphrases that share few words.</p><p class="more-status">The working version was written in November 2026 with an AI coding agent. Public since 2026-11-14.</p></li><li><a class="more-name ul" href="https://github.com/tahamohmadf19-dev/AI-Agent-Router" rel="noopener noreferrer">AI Agent Router</a><p>A typed LangGraph workflow that classifies a message and routes it to one of two reply nodes.</p><p class="more-evidence"><span class="tag tag-ran">Ran</span> 19 tests pass with a fake model. Not run here against a real LLM.</p><p class="more-status">My project. Tests and repairs were added in November 2026 with an AI coding agent. Public since 2026-11-14.</p></li><li><a class="more-name ul" href="https://github.com/tahamohmadf19-dev/bank-marketing-classification" rel="noopener noreferrer">Bank Marketing Classification</a><p>A PySpark notebook on 45,211 records, compared against baselines. All models use call duration, which is only known after a call, so this is not a pre-call predictor.</p><p class="more-evidence"><span class="tag tag-ran">Ran</span> Rerun from a clean environment: test ROC-AUC 0.9268. The 6 repository tests check saved outputs and do not retrain.</p><p class="more-status">My 2025 coursework. The rerun and baselines were added in November 2026 with an AI coding agent. Public since 2026-11-14.</p></li></ul>
+    </div>
+  </section>
 
-<section id="skills">
-  <div class="inner">
-    <div class="section-label reveal">002 — Skills</div>
-    <h2 class="section-title reveal">Core Capabilities</h2>
-    <p class="section-sub reveal">Internship-ready technical skills built through coursework, projects, and hands-on training.</p>
-    <div class="skills-grid">
-      <div class="skill-cat reveal reveal-delay-1">
-        <div class="skill-cat-title">
-          <div class="skill-cat-icon" style="background:rgba(0,212,255,0.1)">💻</div>
-          Programming
-        </div>
-        <div class="skill-tags">
-          <span class="skill-tag featured">Python</span>
-          <span class="skill-tag featured">SQL / MySQL</span>
-          <span class="skill-tag">C++</span>
-          <span class="skill-tag">JavaScript</span>
-          <span class="skill-tag">HTML / CSS</span>
-          <span class="skill-tag">Git & GitHub</span>
-          <span class="skill-tag">Docker</span>
-          <span class="skill-tag">Pydantic</span>
-        </div>
-      </div>
-      <div class="skill-cat reveal reveal-delay-2">
-        <div class="skill-cat-title">
-          <div class="skill-cat-icon" style="background:rgba(0,229,160,0.1)">🤖</div>
-          AI, LLM & Big Data
-        </div>
-        <div class="skill-tags">
-          <span class="skill-tag featured">Machine Learning</span>
-          <span class="skill-tag featured">Apache Spark / PySpark</span>
-          <span class="skill-tag featured">MLlib</span>
-          <span class="skill-tag featured">RAG Systems</span>
-          <span class="skill-tag featured">LangChain</span>
-          <span class="skill-tag featured">LangGraph</span>
-          <span class="skill-tag">AI Agents</span>
-          <span class="skill-tag">Deep Learning</span>
-          <span class="skill-tag">NLP</span>
-          <span class="skill-tag">scikit-learn</span>
-          <span class="skill-tag">Pandas / NumPy</span>
-          <span class="skill-tag">Feature Engineering</span>
-          <span class="skill-tag">Big Data Processing</span>
-        </div>
-      </div>
-      <div class="skill-cat reveal reveal-delay-3">
-        <div class="skill-cat-title">
-          <div class="skill-cat-icon" style="background:rgba(240,180,40,0.1)">📊</div>
-          Analytics & Tools
-        </div>
-        <div class="skill-tags">
-          <span class="skill-tag featured">Power BI</span>
-          <span class="skill-tag">DAX</span>
-          <span class="skill-tag">Power Query</span>
-          <span class="skill-tag">FastAPI</span>
-          <span class="skill-tag">Streamlit</span>
-          <span class="skill-tag">Qdrant</span>
-          <span class="skill-tag">Hugging Face</span>
-          <span class="skill-tag">Sentence Transformers</span>
-          <span class="skill-tag">Jupyter / Colab</span>
-          <span class="skill-tag">VS Code</span>
-          <span class="skill-tag">PyCharm</span>
-          <span class="skill-tag">MATLAB</span>
-          <span class="skill-tag">NoSQL (Basic)</span>
-        </div>
+  <section id="about" class="band band-alt" aria-labelledby="about-title">
+    <div class="band-inner" data-reveal>
+      <h2 id="about-title">About</h2>
+      <div class="about-text"><p>I am an AI Engineer in Amman with a B.Sc. in Data Science and Artificial Intelligence from Philadelphia University. The part of AI work I care about most starts after the first demo: can it be measured, can it be stopped, and what happens when something fails?</p><p>That is why my projects look the way they do. They track evidence, separate tenants and wait for approval. Most of them build on existing software instead of starting from nothing, and each one says so. I also use AI coding agents in my work, and the project pages say where that is known.</p></div>
+      <div class="approach" data-reveal>
+        <h3 class="approach-title">How I work</h3>
+        <ul><li><h3>Measure before claiming</h3><p>Evaluation comes with the system, and a missing measurement stays missing. <a href="#rag-quality-lab">See RAG Quality Lab</a></p></li><li><h3>Keep authority out of the model</h3><p>Scope and permissions live in server code, where a prompt cannot change them.</p></li><li><h3>Give automation a stopping point</h3><p>Risky steps wait for a check or a person, and retries cannot repeat them.</p></li><li><h3>Report what the data supports</h3><p>When a strong number comes from a flawed test, I replace it and explain why. <a href="#edusmartai">See EduSmartAI</a></p></li></ul>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="projects">
-  <div class="inner">
-    <div class="section-label reveal">003 — Projects</div>
-    <h2 class="section-title reveal">Selected Work</h2>
-    <p class="section-sub reveal">End-to-end projects covering ML, big data, analytics, and modern AI systems.</p>
-    <div class="projects-grid">
-      <div class="project-card reveal reveal-delay-1">
-        <div class="project-header">
-          <div class="project-icon" style="background:rgba(0,212,255,0.1);font-size:1.5rem">⚡</div>
-          <span class="project-badge badge-blue">Big Data · ML</span>
-        </div>
-        <div class="project-name">Bank Marketing Classification</div>
-        <div class="project-desc">Full ML pipeline in PySpark to predict term-deposit subscription using the UCI Bank Marketing dataset with 45,000+ records.</div>
-        <ul class="project-bullets">
-          <li>Preprocessing pipeline: handled unknowns, feature encoding, vector assembling</li>
-          <li>Trained & compared multiple classifiers including Random Forest</li>
-          <li>Hyperparameter tuning: up to 200 trees, varying depths via cross-validation</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Apache Spark</span><span class="tech-tag">PySpark</span>
-          <span class="tech-tag">MLlib</span><span class="tech-tag">Random Forest</span><span class="tech-tag">Python</span>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <div class="project-metric">✦ ~90% Accuracy</div>
-          <div class="project-metric">✦ AUC &gt; 0.92</div>
-        </div>
-      </div>
+  <section id="expertise" class="band" aria-labelledby="expertise-title">
+    <div class="band-inner" data-reveal>
+      <h2 id="expertise-title">Technical expertise</h2>
+      <div class="skills" data-reveal><div class="skill-group"><h3>LLM and agents</h3><ul><li>LLM applications</li><li>RAG</li><li>LangGraph</li><li>LangChain</li><li>Claude API</li><li>Prompt engineering</li><li>Structured outputs</li><li>Guardrails</li></ul></div><div class="skill-group"><h3>Retrieval and evaluation</h3><ul><li>Vector search</li><li>Embeddings</li><li>Pinecone</li><li>Qdrant</li><li>Recall@k, precision@k, MRR</li><li>Citation metrics</li><li>AWS Bedrock experiments</li></ul></div><div class="skill-group"><h3>Backend and integration</h3><ul><li>Python</li><li>TypeScript</li><li>FastAPI</li><li>Next.js</li><li>SQL</li><li>PostgreSQL</li><li>SQLAlchemy</li><li>REST APIs</li><li>Webhooks</li></ul></div><div class="skill-group"><h3>Automation and delivery</h3><ul><li>n8n</li><li>Celery</li><li>QStash</li><li>Docker</li><li>Git</li><li>GitHub Actions</li><li>pytest</li><li>Jest</li></ul></div><div class="skill-group"><h3>Machine learning and data</h3><ul><li>scikit-learn</li><li>pandas</li><li>NumPy</li><li>TensorFlow</li><li>Keras</li><li>PySpark</li><li>Power BI</li></ul></div></div>
+    </div>
+  </section>
 
-      <div class="project-card reveal reveal-delay-2">
-        <div class="project-header">
-          <div class="project-icon" style="background:rgba(240,180,40,0.1);font-size:1.5rem">📊</div>
-          <span class="project-badge badge-amber">Power BI · Analytics</span>
-        </div>
-        <div class="project-name">Student Performance Dashboard</div>
-        <div class="project-desc">Interactive Power BI dashboard to track student performance, retention, and early-warning indicators across cohorts and courses.</div>
-        <ul class="project-bullets">
-          <li>Data model: Students, Courses, Assessments, Attendance & Engagement tables</li>
-          <li>DAX KPIs: Pass Rate, Retention Rate, Attendance Rate, At-Risk % with drill-down</li>
-          <li>Early-Warning view flagging at-risk students based on thresholds</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Power BI</span><span class="tech-tag">DAX</span>
-          <span class="tech-tag">Power Query</span><span class="tech-tag">Data Modeling</span>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <div class="project-metric" style="background:rgba(240,180,40,0.08);border-color:rgba(240,180,40,0.25);color:var(--amber)">✦ 5+ KPI Measures</div>
-        </div>
-      </div>
+  <section id="experience" class="band band-alt" aria-labelledby="experience-title">
+    <div class="band-inner" data-reveal>
+      <h2 id="experience-title">Experience</h2>
+      <div class="jobs">
+    <article class="job">
+      <header>
+        <h3>AI Engineering Intern</h3>
+        <p class="job-dates">2026</p>
+        <p class="job-meta">Green Circle for Cybersecurity, Amman, Jordan</p>
+      </header>
+      <p class="job-lead">This work is private, so I describe it at a high level.</p><ul><li>Designed and tested LLM, RAG and AI-agent workflows using Python, n8n, REST APIs and webhooks, with validation, escalation logic and human-in-the-loop controls.</li><li>Built and evaluated AWS Bedrock RAG experiments with S3-backed knowledge sources and citation-grounded test cases.</li><li>Mapped workflows with internal teams, and analyzed SOC alert investigation and reporting as an AI-assisted analyst use case.</li></ul>
+    </article>
+    <article class="job">
+      <header>
+        <h3>Data &amp; AI Trainee</h3>
+        <p class="job-dates">2025</p>
+        <p class="job-meta">Data &amp; AI Training Program, Amman, Jordan</p>
+      </header>
+      <ul><li>Applied Apache Spark and PySpark to data and machine-learning workflows, contributed to LLM and RAG application work, and built Power BI dashboards.</li></ul>
+    </article></div>
+    </div>
+  </section>
 
-      <div class="project-card reveal reveal-delay-3">
-        <div class="project-header">
-          <div class="project-icon" style="background:rgba(0,180,100,0.1);font-size:1.5rem">📚</div>
-          <span class="project-badge badge-green">LLM · RAG</span>
-        </div>
-        <div class="project-name">RAG Document Question Answering System</div>
-        <div class="project-desc">Built an AI system that allows users to upload documents, retrieve the most relevant information using semantic search, and generate answers with an LLM.</div>
-        <ul class="project-bullets">
-          <li>Implemented document upload, text chunking, embeddings, and vector search workflow</li>
-          <li>Used Qdrant for semantic retrieval and Hugging Face models for intelligent answer generation</li>
-          <li>Designed a practical API and interactive interface for real-world document QA</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Python</span><span class="tech-tag">FastAPI</span>
-          <span class="tech-tag">Qdrant</span><span class="tech-tag">Hugging Face</span>
-          <span class="tech-tag">Sentence Transformers</span><span class="tech-tag">Docker</span>
-          <span class="tech-tag">Streamlit</span>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-          <div class="project-metric" style="background:rgba(0,180,100,0.08);border-color:rgba(0,180,100,0.2);color:#00e08a">✦ RAG Pipeline</div>
-          <div class="project-metric" style="background:rgba(0,180,100,0.08);border-color:rgba(0,180,100,0.2);color:#00e08a">✦ Semantic Search</div>
-        </div>
-        <div class="project-links">
-          <a href="https://lnkd.in/di4bekHP" target="_blank" class="project-link primary">View Project ↗</a>
-          <a href="https://github.com/tahamohmadf19-dev" target="_blank" class="project-link ghost">GitHub Profile</a>
-        </div>
-      </div>
-
-      <div class="project-card reveal reveal-delay-4">
-        <div class="project-header">
-          <div class="project-icon" style="background:rgba(0,212,255,0.12);font-size:1.5rem">🤖</div>
-          <span class="project-badge badge-cyan">AI Agents · LLM</span>
-        </div>
-        <div class="project-name">AI Agent Router</div>
-        <div class="project-desc">Developed an AI system that classifies user intent and routes messages to specialized agents for more suitable responses instead of relying on a single chatbot.</div>
-        <ul class="project-bullets">
-          <li>Built intent-based routing logic using LangGraph and modular agent architecture</li>
-          <li>Implemented a Therapist Agent for supportive responses and a Logical Agent for direct factual answers</li>
-          <li>Improved understanding of agent workflows, orchestration, and scalable AI system design</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Python</span><span class="tech-tag">LangChain</span>
-          <span class="tech-tag">LangGraph</span><span class="tech-tag">Claude LLM</span>
-          <span class="tech-tag">Pydantic</span><span class="tech-tag">Streamlit</span>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-          <div class="project-metric">✦ Agent Routing</div>
-          <div class="project-metric">✦ Intent Classification</div>
-        </div>
-        <div class="project-links">
-          <a href="https://lnkd.in/dGGnN7rA" target="_blank" class="project-link primary">View Project ↗</a>
-          <a href="https://github.com/tahamohmadf19-dev" target="_blank" class="project-link ghost">GitHub Profile</a>
-        </div>
-      </div>
-
-      <div class="project-card reveal reveal-delay-1">
-        <div class="project-header">
-          <div class="project-icon" style="background:rgba(0,180,100,0.1);font-size:1.5rem">🗄️</div>
-          <span class="project-badge badge-green">Python · Database</span>
-        </div>
-        <div class="project-name">Student Management System</div>
-        <div class="project-desc">CLI-based student management system using Python 3 and SQLite with full CRUD operations and data validation.</div>
-        <ul class="project-bullets">
-          <li>Email & age validation using regular expressions and robust input handling</li>
-          <li>OOP design: Student and DataManager classes with type hints</li>
-          <li>Auto-generated student IDs and persistent SQLite storage</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Python 3</span><span class="tech-tag">SQLite</span>
-          <span class="tech-tag">OOP</span><span class="tech-tag">Regex</span><span class="tech-tag">CLI</span>
-        </div>
-        <div style="display:flex;gap:8px">
-          <div class="project-metric" style="background:rgba(0,180,100,0.08);border-color:rgba(0,180,100,0.2);color:#00e08a">✦ Full CRUD</div>
-        </div>
-      </div>
-
-      <div class="project-card reveal reveal-delay-2" style="border-color:rgba(0,212,255,0.15);background:linear-gradient(135deg,var(--surface) 0%,rgba(0,212,255,0.03) 100%)">
-        <div class="project-header">
-          <div class="project-icon" style="background:rgba(0,212,255,0.12);font-size:1.5rem">🎓</div>
-          <span class="project-badge badge-cyan">Graduation Project</span>
-        </div>
-        <div class="project-name">EduSmartAI <span style="color:var(--text3);font-size:0.8rem;font-weight:400">— In Progress</span></div>
-        <div class="project-desc">AI-powered academic advising system combining student risk prediction models with an intelligent chatbot for personalized guidance.</div>
-        <ul class="project-bullets">
-          <li>Dual-model prediction using OULAD & xAPI datasets</li>
-          <li>Random Forest achieving 90.76% and 81.2% accuracy respectively</li>
-          <li>Intelligent chatbot for academic advising and intervention</li>
-        </ul>
-        <div class="project-tech">
-          <span class="tech-tag">Python</span><span class="tech-tag">Random Forest</span>
-          <span class="tech-tag">NLP</span><span class="tech-tag">OULAD</span><span class="tech-tag">xAPI</span>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <div class="project-metric">✦ 90.76% Accuracy</div>
-          <div class="project-metric">✦ 81.2% (xAPI)</div>
-        </div>
+  <section id="education" class="band" aria-labelledby="education-title">
+    <div class="band-inner" data-reveal>
+      <h2 id="education-title">Education</h2>
+      <div class="edu">
+        <p class="degree">B.Sc. in Data Science and Artificial Intelligence</p>
+        <p class="degree-meta">Philadelphia University, Amman, 2026</p>
+        <h3 class="cert-title">Certificates and training</h3>
+        <ul class="certs"><li><span class="cert-name"><a class="ul" href="https://verify.skilljar.com/c/9hj2y5kypwrj" rel="noopener noreferrer">AI Fluency for Students</a></span><span class="cert-meta">Anthropic. Certificate of completion.</span></li><li><span class="cert-name"><a class="ul" href="https://verify.skilljar.com/c/rpifmvjyieb2" rel="noopener noreferrer">Claude 101</a></span><span class="cert-meta">Anthropic. Certificate of completion.</span></li><li><span class="cert-name">Microsoft Azure AI Fundamentals (AI-900) preparation course</span><span class="cert-meta">INJAZ. Certificate of attendance, not the Microsoft exam.</span></li><li><span class="cert-name">Data Science Full Track</span><span class="cert-meta">Data &amp; AI Training Program.</span></li><li><span class="cert-name">Power BI Pro &amp; SQL</span><span class="cert-meta">Data &amp; AI Training Program.</span></li></ul>
       </div>
     </div>
+  </section>
 
-    <div style="text-align:center;margin-top:32px" class="reveal">
-      <a href="https://github.com/tahamohmadf19-dev" target="_blank" class="btn-ghost" style="display:inline-flex;align-items:center;gap:8px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
-        More on GitHub ↗
-      </a>
-    </div>
-  </div>
-</section>
-
-<section id="experience">
-  <div class="inner">
-    <div class="section-label reveal">004 — Experience</div>
-    <h2 class="section-title reveal">Work & Education</h2>
-    <p class="section-sub reveal">Hands-on training and academic foundation in data science, AI, LLM applications, and big data.</p>
-    <div class="exp-grid">
+  <section id="contact" class="band band-alt" aria-labelledby="contact-title">
+    <div class="band-inner" data-reveal>
+      <h2 id="contact-title">Contact</h2>
       <div>
-        <div class="timeline reveal">
-          <div class="timeline-item">
-            <div class="timeline-dot"></div>
-            <div class="timeline-date">2025 · Amman, Jordan</div>
-            <div class="timeline-role">Data & AI Trainee</div>
-            <div class="timeline-company">Qafzeh Data & AI Training Program</div>
-            <ul class="timeline-list">
-              <li>Trained on Python programming, SQL/MySQL, NoSQL, and data analysis workflows</li>
-              <li>Worked with big data tools using Apache Spark for large-scale processing and MLlib models</li>
-              <li>Practiced classical ML and deep learning techniques for classification and regression</li>
-              <li>Built analytical dashboards using Power BI to visualize KPIs and business insights from real datasets</li>
-              <li>Expanded my practical skills through self-driven work in RAG systems, LLM applications, LangChain, and LangGraph</li>
-            </ul>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot"></div>
-            <div class="timeline-date">2025 · Amman, Jordan</div>
-            <div class="timeline-role">Call Center Agent (Part-Time)</div>
-            <div class="timeline-company">Private Call Center</div>
-            <ul class="timeline-list">
-              <li>Handled inbound customer calls, recorded issues, and escalated technical problems</li>
-              <li>Used CRM and data entry tools to log customer information accurately</li>
-              <li>Strengthened communication, active listening, and problem-solving skills</li>
-            </ul>
-          </div>
-        </div>
-        <div style="margin-top:32px" class="reveal">
-          <div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-            <span style="color:var(--amber)">▸</span> Volunteer Work
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px">
-            <ul style="list-style:none;display:flex;flex-direction:column;gap:8px">
-              <li style="display:flex;align-items:flex-start;gap:8px;color:var(--text2);font-size:0.85rem"><span style="color:var(--amber);flex-shrink:0">▸</span>Led a scout group in organizing field activities and community service days</li>
-              <li style="display:flex;align-items:flex-start;gap:8px;color:var(--text2);font-size:0.85rem"><span style="color:var(--amber);flex-shrink:0">▸</span>Participated in charity campaigns including Ramadan Iftar events and donation drives</li>
-              <li style="display:flex;align-items:flex-start;gap:8px;color:var(--text2);font-size:0.85rem"><span style="color:var(--amber);flex-shrink:0">▸</span>Provided free academic support sessions in IT and mathematics for students</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="exp-aside reveal">
-        <div class="edu-card">
-          <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--cyan);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Education</div>
-          <div class="edu-degree">B.Sc. Data Science & Artificial Intelligence</div>
-          <div class="edu-univ">Philadelphia University</div>
-          <div class="edu-detail">Amman, Jordan · 2022 – 2026</div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
-          <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--amber);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">Soft Skills</div>
-          <div style="display:flex;flex-wrap:wrap;gap:7px">
-            <span class="skill-tag">Problem Solving</span>
-            <span class="skill-tag">Communication</span>
-            <span class="skill-tag">Teamwork</span>
-            <span class="skill-tag">Time Management</span>
-            <span class="skill-tag">Attention to Detail</span>
-            <span class="skill-tag">Fast Learning</span>
-            <span class="skill-tag">Adaptability</span>
-          </div>
-        </div>
+        <p class="contact-line">Open to AI Engineer roles. Open to relocation. Based in Amman, Jordan.</p>
+        <p class="contact-mail"><a class="ul" href="mailto:tahamohmadf19@gmail.com">tahamohmadf19@gmail.com</a></p>
+        <ul class="contact-links"><li><a class="ul" href="https://github.com/tahamohmadf19-dev" rel="noopener noreferrer">GitHub</a></li><li><a class="ul" href="https://www.linkedin.com/in/mohmad-taha-alhmad/" rel="noopener noreferrer">LinkedIn</a></li><li><a class="ul" href="https://www.kaggle.com/tahamohmad" rel="noopener noreferrer">Kaggle</a></li></ul>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+</main>
 
-<section id="credentials">
-  <div class="inner">
-    <div class="section-label reveal">005 — Credentials</div>
-    <h2 class="section-title reveal">Courses & Certifications</h2>
-    <p class="section-sub reveal">Continuous learning to stay sharp at the edge of data, AI, and intelligent systems.</p>
-    <div class="cred-grid">
-      <div class="cred-card reveal reveal-delay-1">
-        <div class="cred-icon">☁️</div>
-        <div class="cred-name">Microsoft Azure AI Fundamentals</div>
-        <div class="cred-issuer">Microsoft · AI-900</div>
-        <div class="cred-year">Preparation Course · 2025</div>
-      </div>
-      <div class="cred-card reveal reveal-delay-2">
-        <div class="cred-icon">🏗️</div>
-        <div class="cred-name">Digital Foundations Program</div>
-        <div class="cred-issuer">Training Program</div>
-        <div class="cred-year">2025</div>
-      </div>
-      <div class="cred-card reveal reveal-delay-3">
-        <div class="cred-icon">🤖</div>
-        <div class="cred-name">Applied LLM & Agent Systems</div>
-        <div class="cred-issuer">Self-Learning Journey</div>
-        <div class="cred-year">RAG · LangChain · LangGraph · 2025</div>
-      </div>
-      <div class="cred-card reveal reveal-delay-1">
-        <div class="cred-icon">⚡</div>
-        <div class="cred-name">Apache Spark & Big Data</div>
-        <div class="cred-issuer">Qafzeh Data & AI</div>
-        <div class="cred-year">MLlib · PySpark · 2025</div>
-      </div>
-      <div class="cred-card reveal reveal-delay-2">
-        <div class="cred-icon">📊</div>
-        <div class="cred-name">Power BI Analytics</div>
-        <div class="cred-issuer">Qafzeh Data & AI</div>
-        <div class="cred-year">DAX · Data Modeling · 2025</div>
-      </div>
-      <div class="cred-card reveal reveal-delay-3">
-        <div class="cred-icon">🎓</div>
-        <div class="cred-name">B.Sc. Data Science & AI</div>
-        <div class="cred-issuer">Philadelphia University</div>
-        <div class="cred-year">Expected Graduation · 2026</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="contact">
-  <div class="inner">
-    <div class="section-label reveal">006 — Contact</div>
-    <h2 class="section-title reveal">Let's Connect</h2>
-    <p class="section-sub reveal">Open to internship opportunities, collaborations, and interesting problems.</p>
-    <div class="contact-grid">
-      <div class="reveal">
-        <div class="contact-info">
-          <div class="contact-item">
-            <div class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-            <div><div class="contact-item-label">Email</div><a href="mailto:tahamohmadf19@gmail.com" class="contact-item-val">tahamohmadf19@gmail.com</a></div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 01.98 2.18 2 2 0 012.96 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0121.22 14z"/></svg></div>
-            <div><div class="contact-item-label">Phone</div><div class="contact-item-val">+962 78149 9491</div></div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-            <div><div class="contact-item-label">Location</div><div class="contact-item-val">Amman, Jordan</div></div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div>
-            <div><div class="contact-item-label">LinkedIn</div><a href="https://linkedin.com/in/mohmad-taha-alhmad" target="_blank" class="contact-item-val" style="color:var(--cyan)">Mohmad-Taha-Alhmad ↗</a></div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg></div>
-            <div><div class="contact-item-label">GitHub</div><a href="https://github.com/tahamohmadf19-dev" target="_blank" class="contact-item-val" style="color:var(--cyan)">tahamohmadf19-dev ↗</a></div>
-          </div>
-        </div>
-      </div>
-      <div class="contact-form reveal reveal-delay-2">
-        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:6px">Send a Message</div>
-        <div style="color:var(--text3);font-size:0.85rem;margin-bottom:24px;font-family:var(--font-mono)">// I respond within 24 hours</div>
-        <div class="form-group">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" placeholder="Your Name">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email Address</label>
-          <input type="email" class="form-input" placeholder="your@email.com">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Message</label>
-          <textarea class="form-input" rows="4" placeholder="Let's talk about..."></textarea>
-        </div>
-        <button class="form-btn" onclick="this.textContent='Message Sent ✓';this.style.background='var(--green)';this.style.color='var(--bg)'">Send Message →</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-copy">© 2025 Mohammad Taha Alhmad · Built with ♥ in Amman</div>
-  <div class="footer-links">
-    <a href="https://github.com/tahamohmadf19-dev" target="_blank">GitHub</a>
-    <a href="https://linkedin.com/in/mohmad-taha-alhmad" target="_blank">LinkedIn</a>
-    <a href="https://kaggle.com/tahamohmadf19" target="_blank">Kaggle</a>
-    <a href="mailto:tahamohmadf19@gmail.com">Email</a>
+<footer class="foot">
+  <div class="foot-inner">
+    <p>Mohammad Taha Alhmad, AI Engineer</p>
+    <a class="ul" href="#main">Back to top</a>
   </div>
 </footer>
-
-<script>
-const canvas = document.getElementById('canvas-bg');
-const ctx = canvas.getContext('2d');
-let particles = [], W, H;
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
-resize();window.addEventListener('resize',resize);
-class Particle{
-  constructor(){this.reset()}
-  reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.radius=Math.random()*1.5+.5;this.alpha=Math.random()*.4+.1;this.color=Math.random()>.7?'#00d4ff':Math.random()>.5?'#f0b429':'#ffffff'}
-  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}
-  draw(){ctx.save();ctx.globalAlpha=this.alpha;ctx.fillStyle=this.color;ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);ctx.fill();ctx.restore()}
-}
-for(let i=0;i<80;i++)particles.push(new Particle());
-function connectParticles(){for(let i=0;i<particles.length;i++){for(let j=i+1;j<particles.length;j++){const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<120){ctx.save();ctx.globalAlpha=(1-dist/120)*.08;ctx.strokeStyle='#00d4ff';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.stroke();ctx.restore()}}}}
-function animate(){ctx.clearRect(0,0,W,H);particles.forEach(p=>{p.update();p.draw()});connectParticles();requestAnimationFrame(animate)}
-animate();
-
-const titles=[
-  'Data Science & AI Engineer · LLM Engineer · Big Data Engineer',
-  'RAG & LLM Applications Builder',
-  'LangChain / LangGraph Developer',
-  'Big Data Engineer',
-  'ML Pipeline Builder'
-];
-let ti=0,ci=0,deleting=false;
-const el=document.getElementById('typed-title');
-function typeWriter(){const current=titles[ti];if(!deleting){el.textContent=current.slice(0,++ci);if(ci===current.length){deleting=true;setTimeout(typeWriter,2000);return}}else{el.textContent=current.slice(0,--ci);if(ci===0){deleting=false;ti=(ti+1)%titles.length}}setTimeout(typeWriter,deleting?30:55)}
-setTimeout(typeWriter,1000);
-
-window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50)});
-
-const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-const countObserver=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,target=+el.dataset.count;let current=0;const step=target/40;const timer=setInterval(()=>{current=Math.min(current+step,target);el.textContent=Math.round(current)+(el.dataset.suffix||'');if(current>=target)clearInterval(timer)},30);countObserver.unobserve(el)})},{threshold:0.5});
-document.querySelectorAll('[data-count]').forEach(el=>countObserver.observe(el));
-
-function downloadCV(){
-  window.open("MOHMAD-TAHA-JASEM-ALHMAD-FlowCV-Resume-20260122.pdf","_blank");
-}
-
-const sections=document.querySelectorAll('section[id]');
-const navLinks=document.querySelectorAll('.nav-links a');
-window.addEventListener('scroll',()=>{
-  let current='';
-  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)current=s.id});
-  navLinks.forEach(a=>{a.style.color=a.getAttribute('href')==='#'+current?'var(--cyan)':''});
-});
-</script>
 </body>
 </html>
