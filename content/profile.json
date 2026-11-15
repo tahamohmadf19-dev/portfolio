@@ -374,7 +374,7 @@
       ]
     },
     {
-      "org": "Data & AI Training Program",
+      "org": "Qafza Tech",
       "place": "Amman, Jordan",
       "role": "Data & AI Trainee",
       "dates": "2025",
@@ -430,7 +430,7 @@
   "resolved_for_release": {
     "CV source: CV (4) is byte-identical to the 28 October CV. CV (4)(2) was not received. Facts come from that CV and verified work.": "No resume is linked from the 2026-11-14 release. Facts shown are the confirmed ones: Green Circle title and year, degree, and verified project work.",
     "Green Circle: exact start and end months (CV: Jul-Oct 2026, LinkedIn: Sep-Nov 2026). The site shows the confirmed title and year only.": "Omitted: the site shows only the confirmed title and year.",
-    "Training provider: official spelling (Qafza Tech, Qafza.Tech or Qafzeh). The site names the program generically until confirmed.": "Omitted: the program is named generically, without provider or hours.",
+    "Training provider: official spelling (Qafza Tech, Qafza.Tech or Qafzeh). The site names the program generically until confirmed.": "Confirmed by the owner on 2026-11-15: Qafza Tech. Hours remain unconfirmed and are not shown.",
     "Private work: owner approval to describe private projects, including a private project's audit numbers, in public.": "Held: the private projects case studies are not published (held_projects).",
     "Resume: owner approval of the PDF linked from this site.": "Held: no resume PDF or link is published (cv_url is null).",
     "EduSmartAI: whether the owner was a team member, and the reason PR #7 closed.": "Only facts visible on GitHub are stated (owner, branch, PR #7 closed without review). No team membership is claimed.",

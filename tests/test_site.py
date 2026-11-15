@@ -524,7 +524,7 @@ def test_graphics_and_focus_rings_meet_3_to_1(foreground, background):
 def test_page_shows_confirmed_facts_only():
     """Disputed details stay in the private unconfirmed list, never on the page."""
     text = re.sub(r"<[^>]+>", " ", HTML)
-    for disputed in ("Qafza", "Qafzeh", "Jul 2026", "Oct 2026", "Sep 2026", "Nov 2026", "Pending confirmation"):
+    for disputed in ("Qafzeh", "Qafza.Tech", "90h", "44h", "Jul 2026", "Oct 2026", "Sep 2026", "Nov 2026", "Pending confirmation"):
         assert disputed not in text, disputed
     green = next(job for job in DATA["experience"] if job["org"] == "Green Circle for Cybersecurity")
     assert (green["role"], green["dates"]) == ("AI Engineering Intern", "2026")
