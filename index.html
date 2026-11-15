@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; style-src &#x27;self&#x27;; script-src &#x27;self&#x27;; font-src &#x27;self&#x27;; img-src &#x27;self&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; style-src &#x27;self&#x27;; script-src &#x27;self&#x27;; font-src &#x27;self&#x27;; img-src &#x27;self&#x27;; base-uri &#x27;none&#x27;; connect-src https://api.web3forms.com; form-action https://api.web3forms.com">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0B0F12">
@@ -20,8 +20,8 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/source-serif-4.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/site.css?v=f9656976">
-<script src="assets/site.js?v=f1a990cc"></script>
+<link rel="stylesheet" href="assets/site.css?v=89fe5c7b">
+<script src="assets/site.js?v=9ca0fa7e"></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Mohammad Taha Alhmad", "jobTitle": "AI Engineer", "url": "https://tahamohmadf19-dev.github.io/portfolio/", "email": "mailto:tahamohmadf19@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Amman", "addressCountry": "JO"}, "alumniOf": {"@type": "CollegeOrUniversity", "name": "Philadelphia University"}, "sameAs": ["https://github.com/tahamohmadf19-dev", "https://www.linkedin.com/in/mohmad-taha-alhmad/", "https://www.kaggle.com/tahamohmad"]}</script>
 </head>
 <body>
@@ -244,6 +244,56 @@
       <h2 id="contact-title">Contact</h2>
       <div>
         <p class="contact-line">Open to AI Engineer and ML/MLOps roles. Open to relocation. Based in Amman, Jordan.</p>
+        <form class="contact-form" id="contact-form" action="https://api.web3forms.com/submit" method="post" accept-charset="UTF-8" aria-labelledby="contact-form-title" aria-describedby="cf-intro">
+          <h3 id="contact-form-title" class="form-title">Send a message</h3>
+          <p id="cf-intro" class="form-intro">All fields are required unless marked optional. You will not need an email app.</p>
+          <input type="hidden" name="access_key" value="">
+          <input type="hidden" name="subject" value="Portfolio inquiry">
+          <input type="hidden" name="from_name" value="Portfolio contact form">
+          <input type="hidden" name="redirect" value="https://tahamohmadf19-dev.github.io/portfolio/contact-sent.html">
+          <div class="field-row">
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input id="cf-name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="cf-name-error">
+              <p class="field-error" id="cf-name-error"></p>
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input id="cf-email" name="email" type="email" autocomplete="email" inputmode="email" spellcheck="false" required maxlength="254" aria-describedby="cf-email-error">
+              <p class="field-error" id="cf-email-error"></p>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="cf-org">Organization <span class="optional">(optional)</span></label>
+              <input id="cf-org" name="organization" type="text" autocomplete="organization" maxlength="120" aria-describedby="cf-org-error">
+              <p class="field-error" id="cf-org-error"></p>
+            </div>
+            <div class="field">
+              <label for="cf-type">Inquiry type</label>
+              <select id="cf-type" name="inquiry" required aria-describedby="cf-type-error">
+                <option value="">Choose one</option><option value="Job opportunity">Job opportunity</option><option value="Freelance or contract work">Freelance or contract work</option><option value="Collaboration or research">Collaboration or research</option><option value="Something else">Something else</option>
+              </select>
+              <p class="field-error" id="cf-type-error"></p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cf-message">Message</label>
+            <textarea id="cf-message" name="message" rows="6" required minlength="20" maxlength="4000" aria-describedby="cf-message-hint cf-message-error"></textarea>
+            <p class="field-hint" id="cf-message-hint">At least 20 characters. <span class="counter" data-max="4000">0 of 4,000</span></p>
+            <p class="field-error" id="cf-message-error"></p>
+          </div>
+          <div class="hp" aria-hidden="true">
+            <label for="cf-botcheck">Leave this box unchecked</label>
+            <input type="checkbox" id="cf-botcheck" name="botcheck" tabindex="-1" autocomplete="off">
+          </div>
+          <p class="form-privacy" id="cf-privacy">Your message goes to my inbox through Web3Forms, and I use your details only to reply. Web3Forms keeps submissions for up to three years (<a class="ul" href="https://web3forms.com/privacy" rel="noopener noreferrer">its privacy policy</a>). Please do not include sensitive personal data.</p>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary form-submit" aria-describedby="cf-privacy"><span class="form-submit-label">Send message</span></button>
+          </div>
+          <div class="form-status" id="cf-status" role="status" aria-live="polite" tabindex="-1"></div>
+        </form>
+        <p class="contact-direct">Or email me directly:</p>
         <p class="contact-mail"><a class="ul" href="mailto:tahamohmadf19@gmail.com">tahamohmadf19@gmail.com</a></p>
         <ul class="contact-links"><li><a class="ul" href="https://github.com/tahamohmadf19-dev" rel="noopener noreferrer">GitHub</a></li><li><a class="ul" href="https://www.linkedin.com/in/mohmad-taha-alhmad/" rel="noopener noreferrer">LinkedIn</a></li><li><a class="ul" href="https://www.kaggle.com/tahamohmad" rel="noopener noreferrer">Kaggle</a></li></ul>
         <div class="resume" id="resume"><h3 class="resume-title">Resume</h3><ul class="cv-cards"><li class="cv-card"><p class="cv-card-role">AI Engineer</p><p class="cv-card-focus">LLM applications, RAG, agent workflows and backend integration.</p><a class="btn btn-cv" href="assets/cv/Mohammad_Taha_Alhmad_AI_Engineer_Resume.pdf" download><span class="cv-icon" aria-hidden="true"></span>Download PDF</a></li><li class="cv-card"><p class="cv-card-role">ML &amp; MLOps Engineer</p><p class="cv-card-focus">Model serving, evaluation, reproducibility and CI for ML.</p><a class="btn btn-cv" href="assets/cv/Mohammad_Taha_Alhmad_ML_MLOps_Engineer_Resume.pdf" download><span class="cv-icon" aria-hidden="true"></span>Download PDF</a></li></ul><p class="cv-note">PDF, one page, updated November 2026. Contact details are email and links only.</p></div>

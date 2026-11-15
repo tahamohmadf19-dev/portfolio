@@ -578,5 +578,24 @@
       "source_label": "Olist MLOps case study",
       "source_url": "case-studies/olist-mlops.html"
     }
+  },
+  "contact_form": {
+    "provider": "Web3Forms",
+    "endpoint": "https://api.web3forms.com/submit",
+    "access_key": "",
+    "access_key_note": "Public by design (Web3Forms docs). Created by the owner at web3forms.com with the contact email; the strict build refuses an empty key.",
+    "privacy_url": "https://web3forms.com/privacy",
+    "inquiry_types": [
+      "Job opportunity",
+      "Freelance or contract work",
+      "Collaboration or research",
+      "Something else"
+    ],
+    "limits": {
+      "name": 100,
+      "organization": 120,
+      "message_min": 20,
+      "message_max": 4000
+    }
   }
 }

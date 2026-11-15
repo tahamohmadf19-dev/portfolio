@@ -97,6 +97,179 @@ document.addEventListener("DOMContentLoaded", function () {
     select(figure.classList.contains("check-co2") ? buttons[2] || buttons[0] : buttons[buttons.length - 1]);
   });
 
+  // Contact form: sent from the page with fetch. Without the script the browser posts the
+  // same form to the provider, which redirects to contact-sent.html.
+  var form = document.getElementById("contact-form");
+  if (form && window.fetch && window.FormData) {
+    form.noValidate = true;
+    var status = document.getElementById("cf-status");
+    var submit = form.querySelector(".form-submit");
+    var label = form.querySelector(".form-submit-label");
+    var counter = form.querySelector(".counter");
+    var loadedAt = Date.now();
+    var sending = false;
+    var touched = {};
+    var email = (document.querySelector('.contact-mail a') || {}).textContent || "";
+    var rules = {
+      name: function (v) { return v.trim() ? "" : "Enter your name."; },
+      email: function (v) {
+        if (!v.trim()) { return "Enter your email address, so I can reply."; }
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? "" : "Enter a valid email address, like name@example.com.";
+      },
+      organization: function (v) { return v.length <= 120 ? "" : "Keep the organization under 120 characters."; },
+      inquiry: function (v) { return v ? "" : "Choose what your message is about."; },
+      message: function (v) {
+        var n = v.trim().length;
+        if (n < 20) { return "Write at least 20 characters, so I can reply usefully."; }
+        return n <= 4000 ? "" : "Keep the message under 4,000 characters.";
+      }
+    };
+    var fields = Object.keys(rules).map(function (name) { return form.elements[name]; });
+
+    function check(field) {
+      var message = rules[field.name](field.value);
+      var error = document.getElementById(field.getAttribute("aria-describedby").split(" ").pop());
+      error.textContent = message;
+      if (message) {
+        field.setAttribute("aria-invalid", "true");
+      } else {
+        field.removeAttribute("aria-invalid");
+      }
+      return !message;
+    }
+
+    function setStatus(kind, text) {
+      status.className = "form-status is-" + kind;
+      status.textContent = text;
+    }
+
+    function setSending(isSending) {
+      sending = isSending;
+      submit.disabled = isSending;
+      form.setAttribute("aria-busy", isSending ? "true" : "false");
+      label.textContent = isSending ? "Sending…" : "Send message";
+    }
+
+    function fingerprint(values) {
+      return [values.name, values.email, values.inquiry, values.message].map(function (v) {
+        return String(v).trim().toLowerCase().replace(/\s+/g, " ");
+      }).join("|");
+    }
+
+    function remembered(key) {
+      try { return window.sessionStorage.getItem("contact-sent") === key; } catch (err) { return false; }
+    }
+
+    function remember(key) {
+      try { window.sessionStorage.setItem("contact-sent", key); } catch (err) { /* private mode: no memory */ }
+    }
+
+    fields.forEach(function (field) {
+      field.addEventListener("blur", function () {
+        if (field.value || touched[field.name]) {
+          touched[field.name] = true;
+          check(field);
+        }
+      });
+      field.addEventListener("input", function () {
+        if (field.getAttribute("aria-invalid") === "true") {
+          check(field);
+        }
+      });
+    });
+    if (counter) {
+      form.elements.message.addEventListener("input", function () {
+        counter.textContent = form.elements.message.value.length.toLocaleString("en-US") + " of " +
+          Number(counter.getAttribute("data-max")).toLocaleString("en-US");
+      });
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (sending) {
+        return;
+      }
+      var invalid = fields.filter(function (field) { touched[field.name] = true; return !check(field); });
+      if (invalid.length) {
+        setStatus("error", invalid.length === 1 ? "One field needs attention." : invalid.length + " fields need attention.");
+        invalid[0].focus();
+        return;
+      }
+      var values = {};
+      fields.forEach(function (field) { values[field.name] = field.value.trim(); });
+      var key = fingerprint(values);
+      if (remembered(key)) {
+        setStatus("success", "This message was already sent. There is no need to send it again.");
+        status.focus();
+        return;
+      }
+      // Bots: a ticked honeypot or a form sent faster than a person can type it.
+      if (form.elements.botcheck.checked) {
+        setStatus("success", "Thank you. Your message was sent.");
+        return;
+      }
+      if (Date.now() - loadedAt < 3000) {
+        setStatus("error", "That was very quick. Please check your message, then send it again.");
+        return;
+      }
+      var accessKey = form.elements.access_key.value;
+      if (!accessKey) {
+        setStatus("error", "The form is not connected yet. Please email me at " + email + ".");
+        status.focus();
+        return;
+      }
+      if (navigator.onLine === false) {
+        setStatus("error", "You seem to be offline. Your message is still here; send it again when you are connected.");
+        status.focus();
+        return;
+      }
+      setSending(true);
+      setStatus("sending", "Sending your message…");
+      var controller = window.AbortController ? new AbortController() : null;
+      var timer = controller ? window.setTimeout(function () { controller.abort(); }, 15000) : 0;
+      var payload = {
+        access_key: accessKey,
+        subject: "Portfolio inquiry: " + values.inquiry + " from " + values.name,
+        from_name: "Portfolio contact form",
+        replyto: values.email,
+        name: values.name,
+        email: values.email,
+        organization: values.organization || "Not given",
+        inquiry: values.inquiry,
+        message: values.message,
+        botcheck: false
+      };
+      window.fetch(form.getAttribute("action"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller ? controller.signal : undefined
+      }).then(function (response) {
+        return response.json().catch(function () { return {}; }).then(function (body) {
+          return { ok: response.ok && body.success === true, status: response.status };
+        });
+      }).then(function (result) {
+        if (result.ok) {
+          remember(key);
+          form.reset();
+          touched = {};
+          if (counter) { counter.textContent = "0 of " + Number(counter.getAttribute("data-max")).toLocaleString("en-US"); }
+          setStatus("success", "Thank you, " + values.name + ". Your message was sent, and I will reply to " + values.email + ".");
+        } else if (result.status === 429) {
+          setStatus("error", "Too many messages were sent just now. Please try again later, or email me at " + email + ".");
+        } else {
+          setStatus("error", "Your message could not be sent. Please try again, or email me at " + email + ".");
+        }
+      }).catch(function () {
+        setStatus("error", "The form service could not be reached. Your message is still here; try again, or email me at " + email + ".");
+      }).then(function () {
+        window.clearTimeout(timer);
+        setSending(false);
+        status.focus();
+      });
+    });
+  }
+
   // Mobile menu.
   var menuButton = document.querySelector(".menu-btn");
   var menu = document.getElementById("site-nav");

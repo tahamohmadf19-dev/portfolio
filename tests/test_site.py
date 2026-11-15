@@ -43,6 +43,7 @@ def test_index_matches_the_build():
     sys.path.insert(0, str(ROOT / "src"))
     import build
 
+    build.configure_csp(DATA)
     assert build.render(DATA) == HTML
     for project in SHOWN:
         assert build.render_case_study(project, DATA) == CASE_PAGES[project["id"]]
@@ -395,8 +396,10 @@ def test_buttons_are_wired_to_what_they_control(page):
         parser = Page()
         parser.feed(html)
         ids = {a["id"] for _, a in parser.tags if "id" in a}
-        buttons = [a for t, a in parser.tags if t == "button"]
+        buttons = [a for t, a in parser.tags if t == "button" and a.get("type") != "submit"]
         assert buttons
+        submits = [a for t, a in parser.tags if t == "button" and a.get("type") == "submit"]
+        assert len(submits) <= 1, "only the contact form submits"
         for attributes in buttons:
             assert attributes["aria-controls"] in ids
             assert attributes["aria-expanded"] == "false"
@@ -409,9 +412,57 @@ def test_csp_allows_what_the_page_uses(page):
     assert "data:" not in CSS
 
 
-def test_no_form_and_mail_contact_present(page):
-    assert "form" not in page.counts
+FORM = DATA.get("contact_form")
+
+
+def test_mail_contact_stays_present(page):
     assert f'href="mailto:{DATA["person"]["email"]}"' in HTML
+
+
+def test_contact_form_contract(page):
+    if not FORM:
+        assert "form" not in page.counts
+        return
+    assert page.counts.get("form") == 1
+    form = re.search(r'<form class="contact-form".*?</form>', HTML, re.DOTALL).group(0)
+    assert f'action="{FORM["endpoint"]}" method="post"' in form
+    for name, kind in (("name", "input"), ("email", "input"), ("inquiry", "select"), ("message", "textarea")):
+        field = re.search(rf'<{kind} id="(cf-[a-z]+)" name="{name}"[^>]*>', form)
+        assert field and "required" in field.group(0), name
+        assert f'<label for="{field.group(1)}">' in form, f"{name} has a label"
+    assert re.search(r'name="organization"(?![^>]*required)', form), "organization is optional"
+    assert 'type="email"' in form and 'autocomplete="email"' in form
+    honeypot = re.search(r'<div class="hp" aria-hidden="true">.*?</div>', form, re.DOTALL).group(0)
+    assert 'name="botcheck"' in honeypot and 'tabindex="-1"' in honeypot
+    assert 'role="status"' in form and FORM["privacy_url"] in form and "three years" in form
+    assert 'type="submit"' in form
+
+
+def test_csp_opens_only_the_form_endpoint():
+    origin = "/".join(FORM["endpoint"].split("/")[:3])
+    csp = re.search(r'Content-Security-Policy" content="([^"]+)"', HTML).group(1).replace("&#x27;", "'")
+    assert f"connect-src {origin}" in csp and f"form-action {origin}" in csp
+    assert csp.count("https://") == 2 and "'unsafe-inline'" not in csp and "default-src 'none'" in csp
+
+
+def test_strict_build_refuses_a_form_without_an_access_key(tmp_path, monkeypatch):
+    sys.path.insert(0, str(ROOT / "src"))
+    import build
+
+    data = json.loads(json.dumps(DATA))
+    data["contact_form"]["access_key"] = ""
+    content = tmp_path / "profile.json"
+    content.write_text(json.dumps(data), encoding="utf-8")
+    monkeypatch.setattr(build, "CONTENT", content)
+    monkeypatch.setattr(sys, "argv", ["build.py", "--strict"])
+    assert build.main() == 1
+
+
+def test_script_never_sends_without_validation_and_guards():
+    script = (ROOT / "assets" / "site.js").read_text(encoding="utf-8")
+    for guard in ("botcheck", "Date.now() - loadedAt < 3000", "if (sending)", "sessionStorage", "AbortController", "aria-busy", "body.success === true"):
+        assert guard in script, guard
+    assert "mailto:" not in script.split("// Contact form")[1].split("// Mobile menu")[0], "the form never opens an email app"
 
 
 def _luminance(value):

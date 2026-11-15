@@ -17,10 +17,23 @@ OUTPUT = ROOT / "index.html"
 PHOTOS = ROOT / "assets" / "photo"
 CASES = ROOT / "case-studies"
 
-CSP = (
+BASE_CSP = (
     "default-src 'none'; style-src 'self'; script-src 'self'; font-src 'self'; img-src 'self'; "
-    "base-uri 'none'; form-action 'none'"
+    "base-uri 'none'"
 )
+CSP = BASE_CSP + "; form-action 'none'"
+THANKS = ROOT / "contact-sent.html"
+
+
+def configure_csp(data: dict) -> None:
+    """Allow exactly one extra origin, the form endpoint, for fetch and for the no-script form post."""
+    global CSP
+    form = data.get("contact_form")
+    if not form:
+        CSP = BASE_CSP + "; form-action 'none'"
+        return
+    origin = "/".join(form["endpoint"].split("/")[:3])
+    CSP = f"{BASE_CSP}; connect-src {origin}; form-action {origin}"
 KIND_LABEL = {"gate": "Control point", "store": "Data", "step": "Step"}
 
 
@@ -464,6 +477,83 @@ def render_resume_block(person: dict) -> str:
     )
 
 
+def render_contact_form(data: dict) -> str:
+    form, person = data.get("contact_form"), data["person"]
+    if not form:
+        return ""
+    limits = form["limits"]
+    options = "".join(f'<option value="{e(t)}">{e(t)}</option>' for t in form["inquiry_types"])
+    thanks = f'{person["site_url"]}contact-sent.html'
+    return f"""
+        <form class="contact-form" id="contact-form" action="{e(form["endpoint"])}" method="post" accept-charset="UTF-8" aria-labelledby="contact-form-title" aria-describedby="cf-intro">
+          <h3 id="contact-form-title" class="form-title">Send a message</h3>
+          <p id="cf-intro" class="form-intro">All fields are required unless marked optional. You will not need an email app.</p>
+          <input type="hidden" name="access_key" value="{e(form["access_key"])}">
+          <input type="hidden" name="subject" value="Portfolio inquiry">
+          <input type="hidden" name="from_name" value="Portfolio contact form">
+          <input type="hidden" name="redirect" value="{e(thanks)}">
+          <div class="field-row">
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input id="cf-name" name="name" type="text" autocomplete="name" required maxlength="{limits["name"]}" aria-describedby="cf-name-error">
+              <p class="field-error" id="cf-name-error"></p>
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input id="cf-email" name="email" type="email" autocomplete="email" inputmode="email" spellcheck="false" required maxlength="254" aria-describedby="cf-email-error">
+              <p class="field-error" id="cf-email-error"></p>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="cf-org">Organization <span class="optional">(optional)</span></label>
+              <input id="cf-org" name="organization" type="text" autocomplete="organization" maxlength="{limits["organization"]}" aria-describedby="cf-org-error">
+              <p class="field-error" id="cf-org-error"></p>
+            </div>
+            <div class="field">
+              <label for="cf-type">Inquiry type</label>
+              <select id="cf-type" name="inquiry" required aria-describedby="cf-type-error">
+                <option value="">Choose one</option>{options}
+              </select>
+              <p class="field-error" id="cf-type-error"></p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cf-message">Message</label>
+            <textarea id="cf-message" name="message" rows="6" required minlength="{limits["message_min"]}" maxlength="{limits["message_max"]}" aria-describedby="cf-message-hint cf-message-error"></textarea>
+            <p class="field-hint" id="cf-message-hint">At least {limits["message_min"]} characters. <span class="counter" data-max="{limits["message_max"]}">0 of {limits["message_max"]:,}</span></p>
+            <p class="field-error" id="cf-message-error"></p>
+          </div>
+          <div class="hp" aria-hidden="true">
+            <label for="cf-botcheck">Leave this box unchecked</label>
+            <input type="checkbox" id="cf-botcheck" name="botcheck" tabindex="-1" autocomplete="off">
+          </div>
+          <p class="form-privacy" id="cf-privacy">Your message goes to my inbox through {e(form["provider"])}, and I use your details only to reply. {e(form["provider"])} keeps submissions for up to three years (<a class="ul" href="{e(form["privacy_url"])}" rel="noopener noreferrer">its privacy policy</a>). Please do not include sensitive personal data.</p>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary form-submit" aria-describedby="cf-privacy"><span class="form-submit-label">Send message</span></button>
+          </div>
+          <div class="form-status" id="cf-status" role="status" aria-live="polite" tabindex="-1"></div>
+        </form>"""
+
+
+def render_thanks(data: dict) -> str:
+    person = data["person"]
+    return (
+        page_head(f'Message sent | {person["name"]}', "Your message was sent.", person, "", f'{person["site_url"]}contact-sent.html')
+        + page_header(person, "index.html", "index.html")
+        + f"""
+<main id="main" class="case">
+  <section class="case-head">
+    <h1 id="name">Message sent</h1>
+    <p class="statement">Thank you. Your message reached my inbox, and I will reply to the email address you gave.</p>
+    <p class="crumb"><a class="ul" href="index.html">Back to the portfolio</a></p>
+  </section>
+</main>
+"""
+        + page_footer(person, "#main")
+    )
+
+
 COUNT_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
 
 
@@ -611,7 +701,8 @@ def render(data: dict) -> str:
     <div class="band-inner" data-reveal>
       <h2 id="contact-title">Contact</h2>
       <div>
-        <p class="contact-line">{e(person["availability"])} Based in {e(person["location"])}.</p>
+        <p class="contact-line">{e(person["availability"])} Based in {e(person["location"])}.</p>{render_contact_form(data)}
+        <p class="contact-direct">Or email me directly:</p>
         <p class="contact-mail"><a class="ul" href="mailto:{e(person["email"])}">{e(person["email"])}</a></p>
         <ul class="contact-links">{links}</ul>
         {render_resume_block(person)}
@@ -628,7 +719,11 @@ def main() -> int:
     parser.add_argument("--strict", action="store_true", help="Fail while facts remain unconfirmed.")
     args = parser.parse_args()
     data = json.loads(CONTENT.read_text(encoding="utf-8"))
+    configure_csp(data)
     unconfirmed = list(data.get("unconfirmed", []))
+    form = data.get("contact_form")
+    if form and not form.get("access_key"):
+        unconfirmed.append("Contact form: no Web3Forms access key yet, so the form cannot deliver. The owner creates it at web3forms.com.")
     if not photo_files():
         unconfirmed.insert(0, "Portrait: assets/photo is empty. Add the supplied formal photograph with tools/prepare_photo.py.")
     if unconfirmed:
@@ -641,6 +736,10 @@ def main() -> int:
             return 1
     OUTPUT.write_text(render(data), encoding="utf-8", newline="\n")
     print(f"Wrote {OUTPUT.name}")
+    if form:
+        THANKS.write_text(render_thanks(data), encoding="utf-8", newline="\n")
+    else:
+        THANKS.unlink(missing_ok=True)
     CASES.mkdir(exist_ok=True)
     shown = published_projects(data)
     for project in shown:
