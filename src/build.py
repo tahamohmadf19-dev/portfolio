@@ -191,10 +191,11 @@ def page_header(person: dict, home: str, section_prefix: str) -> str:
     <nav id="site-nav" aria-label="Sections">
       <ul>
         <li><a href="{section_prefix}#work">Work</a></li>
+        <li><a href="{section_prefix}#evidence">Evidence</a></li>
         <li><a href="{section_prefix}#about">About</a></li>
-        <li><a href="{section_prefix}#expertise">Expertise</a></li>
         <li><a href="{section_prefix}#experience">Experience</a></li>
-        <li><a href="{section_prefix}#contact">Contact</a></li>
+        <li><a href="{section_prefix}#contact">Contact</a></li>{
+            f'<li class="nav-cv"><a href="{section_prefix}#resume">Resume</a></li>' if person.get("cv_downloads") else ""}
       </ul>
     </nav>
   </div>
@@ -302,6 +303,167 @@ def json_ld(person: dict, education: dict) -> str:
     return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
 
+def num(value: float, digits: int = 4) -> str:
+    return f"{value:.{digits}f}".rstrip("0").rstrip(".") if digits else str(round(value))
+
+
+def render_cv_actions(person: dict, cls: str = "btn") -> str:
+    """One download link per resume version. None are rendered until the owner approves publishing them."""
+    return "".join(
+        f'<li><a class="{cls} btn-cv" href="{e(cv["url"])}" download>'
+        f'<span class="cv-icon" aria-hidden="true"></span><span>Resume <span class="cv-role">{e(cv["label"])}</span></span></a></li>'
+        for cv in person.get("cv_downloads", [])
+    )
+
+
+def render_receipts(receipts: list[dict]) -> str:
+    cells = "".join(
+        f'<li><a href="{e(r["href"])}"><span class="receipt-value" data-count="{e(r["value"])}">{e(r["value"])}</span>'
+        f'<span class="receipt-label">{e(r["label"])}</span><span class="receipt-context">{e(r["context"])}</span></a></li>'
+        for r in receipts
+    )
+    return (
+        f'<div class="receipts enter d6"><p class="receipts-title">Checked, not claimed</p>'
+        f'<ul aria-label="Verified figures from public work">{cells}</ul></div>'
+    )
+
+
+def render_check_co2(v: dict) -> str:
+    """Horizontal bars of RMSE. Widths are SVG attributes, so the strict CSP needs no inline style."""
+    top = max(s["rmse"] for s in v["steps"]) * 1.08
+    rows = []
+    for index, step in enumerate(v["steps"]):
+        note_id = f'{v["id"]}-note-{index}'
+        width = round(step["rmse"] / top * 100, 2)
+        kind = " is-baseline" if step.get("baseline") else ""
+        rows.append(
+            f'<li class="bar-row{kind}">'
+            f'<button type="button" class="bar-btn" aria-expanded="false" aria-controls="{note_id}">'
+            f'<span class="bar-name">{e(step["name"])}</span>'
+            f'<span class="bar-values"><span>RMSE {num(step["rmse"], 2)} {e(v["unit"])}</span><span>R² {e(step["r2"])}</span></span>'
+            f'<svg class="bar" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+            f'<rect class="bar-track" x="0" y="0" width="100" height="8" rx="0"/>'
+            f'<rect class="bar-fill" x="0" y="0" width="{width}" height="8"/></svg></button>'
+            f'<div class="bar-note" id="{note_id}"><p>{e(step["note"])}</p></div></li>'
+        )
+    table = "".join(
+        f'<tr><th scope="row">{e(s["name"])}</th><td>{num(s["rmse"], 2)}</td><td>{e(s["r2"])}</td></tr>' for s in v["steps"]
+    )
+    return f"""
+      <figure class="check check-co2" id="{e(v["id"])}" data-reveal aria-labelledby="{e(v["id"])}-title">
+        <figcaption>
+          <p class="check-kicker">Leakage check</p>
+          <h3 id="{e(v["id"])}-title">{e(v["title"])}</h3>
+          <p class="check-lead">{e(v["lead"])}</p>
+        </figcaption>
+        <p class="bar-axis" aria-hidden="true"><span>Typical error, RMSE in {e(v["unit"])}</span><span>longer is worse</span></p>
+        <ol class="bars">{"".join(rows)}</ol>
+        <div class="sr"><table><caption>{e(v["title"])}</caption><tr><th scope="col">Evaluation</th><th scope="col">RMSE ({e(v["unit"])})</th><th scope="col">R²</th></tr>{table}</table></div>
+        <p class="check-takeaway">{e(v["takeaway"])}</p>
+        <p class="check-source">Source: <a class="ul" href="{e(v["source_url"])}" rel="noopener noreferrer">{e(v["source_label"])}</a></p>
+      </figure>"""
+
+
+def render_check_early(v: dict) -> str:
+    """A line of ROC-AUC by cut-off day against the chance line, drawn at build time."""
+    w, h, left, right, top_pad, bottom = 360, 210, 40, 16, 14, 34
+    lo, hi = 0.4, 0.8
+    x = lambda day: left + (day - 7) / (49 - 7) * (w - left - right)  # noqa: E731
+    y = lambda val: top_pad + (hi - val) / (hi - lo) * (h - top_pad - bottom)  # noqa: E731
+    grid = "".join(
+        f'<line class="grid" x1="{left}" x2="{w - right}" y1="{y(t):.1f}" y2="{y(t):.1f}"/>'
+        f'<text class="tick" x="{left - 6}" y="{y(t) + 3.5:.1f}" text-anchor="end">{t:.1f}</text>'
+        for t in (0.4, 0.6, 0.7, 0.8)
+    )
+    chance = (
+        f'<line class="chance" x1="{left}" x2="{w - right}" y1="{y(v["chance"]):.1f}" y2="{y(v["chance"]):.1f}"/>'
+        f'<text class="tick tick-chance" x="{left - 6}" y="{y(v["chance"]) + 3.5:.1f}" text-anchor="end">0.5</text>'
+        f'<text class="chance-label" x="{w - right}" y="{y(v["chance"]) - 6:.1f}" text-anchor="end">chance</text>'
+    )
+    points = [(x(d["day"]), y(d["auc"])) for d in v["days"]]
+    line = "M" + " L".join(f"{px:.1f} {py:.1f}" for px, py in points)
+    dots, xlabels, buttons, notes = [], [], [], []
+    for index, (d, (px, py)) in enumerate(zip(v["days"], points)):
+        note_id = f'{v["id"]}-note-{index}'
+        dots.append(
+            f'<g class="pt" data-index="{index}"><circle class="pt-halo" cx="{px:.1f}" cy="{py:.1f}" r="11"/>'
+            f'<circle class="pt-dot" cx="{px:.1f}" cy="{py:.1f}" r="5"/>'
+            f'<text class="pt-label" x="{px:.1f}" y="{py - 14:.1f}" text-anchor="middle">{num(d["auc"])}</text></g>'
+        )
+        xlabels.append(f'<text class="tick" x="{px:.1f}" y="{h - bottom + 18}" text-anchor="middle">day {d["day"]}</text>')
+        buttons.append(
+            f'<li><button type="button" class="day-btn" data-index="{index}" aria-expanded="false" aria-controls="{note_id}">'
+            f'Day {d["day"]}</button></li>'
+        )
+        notes.append(
+            f'<div class="day-note" id="{note_id}"><p class="day-figures"><span>Day {d["day"]}</span>'
+            f'<span>ROC-AUC {num(d["auc"])}</span><span>Accuracy {e(d["accuracy"])}</span></p><p>{e(d["note"])}</p></div>'
+        )
+    table = "".join(f'<tr><th scope="row">Day {d["day"]}</th><td>{num(d["auc"])}</td><td>{e(d["accuracy"])}</td></tr>' for d in v["days"])
+    return f"""
+      <figure class="check check-early" id="{e(v["id"])}" data-reveal aria-labelledby="{e(v["id"])}-title">
+        <figcaption>
+          <p class="check-kicker">Validity check</p>
+          <h3 id="{e(v["id"])}-title">{e(v["title"])}</h3>
+          <p class="check-lead">{e(v["lead"])}</p>
+        </figcaption>
+        <div class="chart">
+          <svg viewBox="0 0 {w} {h}" role="img" aria-labelledby="{e(v["id"])}-title" focusable="false">
+            {grid}{chance}
+            <path class="series" d="{line}" pathLength="1"/>
+            {"".join(dots)}{"".join(xlabels)}
+            <text class="axis-label" x="{left}" y="9">ROC-AUC</text>
+          </svg>
+        </div>
+        <ul class="day-btns" aria-label="Cut-off day">{"".join(buttons)}</ul>
+        <div class="day-notes">{"".join(notes)}</div>
+        <div class="sr"><table><caption>{e(v["title"])}</caption><tr><th scope="col">Cut-off</th><th scope="col">ROC-AUC</th><th scope="col">Accuracy</th></tr>{table}</table></div>
+        <p class="check-takeaway">{e(v["takeaway"])}</p>
+        <p class="check-source">Source: <a class="ul" href="{e(v["source_url"])}">{e(v["source_label"])}</a></p>
+      </figure>"""
+
+
+def render_check_olist(v: dict) -> str:
+    meters = []
+    for m in v["metrics"]:
+        model = round(m["model"] / m["max"] * 100, 2)
+        chance = round(m["chance"] / m["max"] * 100, 2)
+        meters.append(
+            f'<li class="meter"><p class="meter-head"><span class="meter-name">{e(m["name"])}</span>'
+            f'<span class="meter-value">{m["model"]:.4f}</span></p>'
+            f'<svg class="meter-bar" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+            f'<rect class="bar-track" x="0" y="2" width="100" height="6"/><rect class="bar-fill" x="0" y="2" width="{model}" height="6"/>'
+            f'<rect class="meter-chance" x="{chance - 0.4}" y="0" width="0.8" height="10"/></svg>'
+            f'<p class="meter-foot"><span class="meter-key" aria-hidden="true"></span>{e(m["chance_label"])}: {num(m["chance"])}'
+            f'<span class="meter-scale">scale 0 to {num(m["max"])}</span></p></li>'
+        )
+    return f"""
+      <figure class="check check-olist" id="{e(v["id"])}" data-reveal aria-labelledby="{e(v["id"])}-title">
+        <figcaption>
+          <p class="check-kicker">Baseline check</p>
+          <h3 id="{e(v["id"])}-title">{e(v["title"])}</h3>
+          <p class="check-lead">{e(v["lead"])}</p>
+        </figcaption>
+        <ul class="meters">{"".join(meters)}</ul>
+        <p class="check-takeaway">{e(v["takeaway"])}</p>
+        <p class="check-source">Source: <a class="ul" href="{e(v["source_url"])}">{e(v["source_label"])}</a></p>
+      </figure>"""
+
+
+def render_resume_block(person: dict) -> str:
+    if not person.get("cv_downloads"):
+        return ""
+    cards = "".join(
+        f'<li class="cv-card"><p class="cv-card-role">{e(cv["label"])}</p><p class="cv-card-focus">{e(cv["focus"])}</p>'
+        f'<a class="btn btn-cv" href="{e(cv["url"])}" download><span class="cv-icon" aria-hidden="true"></span>Download PDF</a></li>'
+        for cv in person["cv_downloads"]
+    )
+    return (
+        f'<div class="resume" id="resume"><h3 class="resume-title">Resume</h3>'
+        f'<ul class="cv-cards">{cards}</ul><p class="cv-note">{e(person["cv_note"])}</p></div>'
+    )
+
+
 COUNT_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
 
 
@@ -323,9 +485,12 @@ def render(data: dict) -> str:
         for p in shown
     )
     projects = "".join(render_project(p, labels) for p in shown)
-    cv = person.get("cv_url")
-    hero_cv = f'<li><a class="btn" href="{e(cv)}" download>Download resume</a></li>' if cv else ""
-    contact_cv = f'<li><a class="ul" href="{e(cv)}" download>Resume (PDF)</a></li>' if cv else ""
+    hero_cv = render_cv_actions(person)
+    visuals = data.get("visuals", {})
+    checks = "".join(
+        render(visuals[key]) for key, render in (("co2", render_check_co2), ("early", render_check_early), ("olist", render_check_olist))
+        if key in visuals
+    )
     more = "".join(
         f'<li>{render_media(m["media"]) if m.get("media") else ""}<a class="more-name ul" href="{e(m["url"])}" rel="noopener noreferrer">{e(m["name"])}</a>'
         f'<p>{e(m["text"])}</p><p class="more-evidence"><span class="tag tag-ran">Ran</span> {e(m["evidence"])}</p><p class="more-status">{e(m["status"])}</p></li>'
@@ -351,9 +516,10 @@ def render(data: dict) -> str:
   <section class="hero" aria-labelledby="name">
     <div class="hero-grid">
       <div class="hero-text">
+        <p class="hero-kicker enter d1"><span class="status-dot" aria-hidden="true"></span>{e(person["availability"])}</p>
         <div class="hero-id">
           <h1 id="name" class="enter d1">{e(person["name"])}</h1>
-          <p class="role enter d2">{e(person["title"])}</p>
+          <p class="role enter d2">{e(person.get("roles", person["title"]))}</p>
         </div>
         <p class="statement enter d3">{e(person["statement"])}</p>
         <ul class="actions enter d4">
@@ -368,6 +534,7 @@ def render(data: dict) -> str:
         <p class="hero-note enter d6">{e(person["location"])}</p>
       </div>
       {render_path(featured)}
+      {render_receipts(data["receipts"]) if data.get("receipts") else ""}
     </div>
     <nav class="index enter d7" aria-label="Selected projects">
       <p class="index-title">Selected systems</p>
@@ -388,9 +555,18 @@ def render(data: dict) -> str:
       </div>
     </div>
     {projects}
-    <div class="more" data-reveal>
+    <div class="more" id="more-work" data-reveal>
       <h3>Smaller public projects</h3>
       <ul>{more}</ul>
+    </div>
+  </section>
+
+  <section id="evidence" class="evidence" aria-labelledby="evidence-title">
+    <div class="section-head" data-reveal>
+      <h2 id="evidence-title">How I check a result</h2>
+      <div class="section-note"><p>A score is a claim until it survives a stricter test. Three results from my public work, checked against leakage, time and chance. Every figure comes from a run recorded in the linked source.</p></div>
+    </div>
+    <div class="checks">{checks}
     </div>
   </section>
 
@@ -437,7 +613,8 @@ def render(data: dict) -> str:
       <div>
         <p class="contact-line">{e(person["availability"])} Based in {e(person["location"])}.</p>
         <p class="contact-mail"><a class="ul" href="mailto:{e(person["email"])}">{e(person["email"])}</a></p>
-        <ul class="contact-links">{links}{contact_cv}</ul>
+        <ul class="contact-links">{links}</ul>
+        {render_resume_block(person)}
       </div>
     </div>
   </section>

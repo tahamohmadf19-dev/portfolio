@@ -39,6 +39,64 @@ document.addEventListener("DOMContentLoaded", function () {
     open(trace.querySelector(".stage-gate .stage-btn") || buttons[0]);
   });
 
+  // Evidence figures: one step or day selected at a time, with arrow keys between them.
+  document.querySelectorAll(".check").forEach(function (figure) {
+    var buttons = Array.prototype.slice.call(figure.querySelectorAll(".bar-btn, .day-btn"));
+    if (!buttons.length) {
+      return;
+    }
+    var points = figure.querySelectorAll(".pt");
+
+    function select(button) {
+      buttons.forEach(function (other) {
+        var isOpen = other === button;
+        other.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        var note = document.getElementById(other.getAttribute("aria-controls"));
+        note.classList.toggle("is-open", isOpen);
+        var row = other.closest(".bar-row");
+        if (row) {
+          row.classList.toggle("is-open", isOpen);
+        }
+      });
+      var index = button.getAttribute("data-index");
+      points.forEach(function (point) {
+        point.classList.toggle("is-active", point.getAttribute("data-index") === index);
+      });
+    }
+
+    buttons.forEach(function (button, index) {
+      button.addEventListener("click", function () {
+        select(button);
+      });
+      button.addEventListener("keydown", function (event) {
+        var next = null;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          next = buttons[Math.min(index + 1, buttons.length - 1)];
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          next = buttons[Math.max(index - 1, 0)];
+        } else if (event.key === "Home") {
+          next = buttons[0];
+        } else if (event.key === "End") {
+          next = buttons[buttons.length - 1];
+        }
+        if (next) {
+          event.preventDefault();
+          next.focus();
+          select(next);
+        }
+      });
+    });
+    // Pointing at a chart point selects its day too.
+    points.forEach(function (point) {
+      point.addEventListener("click", function () {
+        select(buttons[Number(point.getAttribute("data-index"))]);
+      });
+    });
+
+    // Start on the most telling step: the honest score, or the latest day.
+    select(figure.classList.contains("check-co2") ? buttons[2] || buttons[0] : buttons[buttons.length - 1]);
+  });
+
   // Mobile menu.
   var menuButton = document.querySelector(".menu-btn");
   var menu = document.getElementById("site-nav");
@@ -153,6 +211,43 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     path.addEventListener("pointerenter", playPath);
     window.setTimeout(playPath, 1100);
+  }
+
+  // The verified figures count up once, from zero to the number already written in the page.
+  var counters = document.querySelectorAll("[data-count]");
+  if (counters.length) {
+    var countUp = function (element) {
+      var text = element.getAttribute("data-count");
+      var target = Number(text.replace(/,/g, ""));
+      var start = null;
+      var duration = 900;
+      function frame(now) {
+        if (start === null) {
+          start = now;
+        }
+        var t = Math.min((now - start) / duration, 1);
+        var eased = 1 - Math.pow(1 - t, 3);
+        element.textContent = t < 1 ? Math.round(target * eased).toLocaleString("en-US") : text;
+        if (t < 1) {
+          window.requestAnimationFrame(frame);
+        }
+      }
+      window.requestAnimationFrame(frame);
+    };
+    var counted = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            countUp(entry.target);
+            counted.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+    counters.forEach(function (element) {
+      counted.observe(element);
+    });
   }
 
   // A soft light follows the pointer across a project card, on devices that can hover.

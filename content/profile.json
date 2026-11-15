@@ -4,9 +4,9 @@
     "name": "Mohammad Taha Alhmad",
     "title": "AI Engineer",
     "positioning": "AI Engineer | LLMs | RAG | Agentic Systems | AI Automation",
-    "statement": "I design and build practical AI systems, intelligent automation, LLM applications and backend integrations.",
+    "statement": "I build AI and machine-learning systems that are measured before they are trusted: tested services, honest evaluation against baselines, and a person in the loop where it matters.",
     "location": "Amman, Jordan",
-    "availability": "Open to AI Engineer roles. Open to relocation.",
+    "availability": "Open to AI Engineer and ML/MLOps roles. Open to relocation.",
     "email": "tahamohmadf19@gmail.com",
     "site_url": "https://tahamohmadf19-dev.github.io/portfolio/",
     "description": "Mohammad Taha Alhmad is an AI Engineer in Amman building LLM applications, RAG evaluation, agent workflows and backend integrations. Each project states what was built, what was tested and what is unfinished.",
@@ -24,18 +24,34 @@
         "url": "https://www.kaggle.com/tahamohmad"
       }
     ],
-    "cv_url": null,
     "stack_line": [
       "Python",
       "FastAPI",
-      "TypeScript",
+      "scikit-learn",
       "LangGraph",
       "RAG",
-      "Pinecone",
       "Qdrant",
-      "AWS Bedrock",
-      "n8n"
-    ]
+      "MLflow",
+      "DVC",
+      "Docker",
+      "AWS Bedrock"
+    ],
+    "roles": "AI Engineer · Machine Learning & MLOps",
+    "cv_downloads": [
+      {
+        "id": "cv-ai",
+        "label": "AI Engineer",
+        "focus": "LLM applications, RAG, agent workflows and backend integration.",
+        "url": "assets/cv/Mohammad_Taha_Alhmad_AI_Engineer_Resume.pdf"
+      },
+      {
+        "id": "cv-ml",
+        "label": "ML & MLOps Engineer",
+        "focus": "Model serving, evaluation, reproducibility and CI for ML.",
+        "url": "assets/cv/Mohammad_Taha_Alhmad_ML_MLOps_Engineer_Resume.pdf"
+      }
+    ],
+    "cv_note": "PDF, one page, updated November 2026. Contact details are email and links only."
   },
   "projects": [
     {
@@ -335,16 +351,17 @@
       ]
     },
     {
-      "heading": "Automation and delivery",
+      "heading": "MLOps and delivery",
       "items": [
-        "n8n",
-        "Celery",
-        "QStash",
+        "MLflow",
+        "DVC",
+        "Prometheus",
         "Docker",
-        "Git",
         "GitHub Actions",
         "pytest",
-        "Jest"
+        "Feature-parity tests",
+        "n8n",
+        "Celery"
       ]
     },
     {
@@ -389,6 +406,12 @@
     "school": "Philadelphia University, Amman",
     "year": "2026",
     "certificates": [
+      {
+        "name": "MLOps Training",
+        "issuer": "Qafza Tech",
+        "note": "Completed November 2026",
+        "url": null
+      },
       {
         "name": "AI Fluency for Students",
         "issuer": "Anthropic",
@@ -438,5 +461,122 @@
     "a private project AI: owner decision on the prompt that hides automation from customers.": "Held with a private project AI (held_projects).",
     "Private repositories": "Owner rule 2026-11-15: private projects (private projects) are never featured publicly."
   },
-  "featured": "olist-mlops"
+  "featured": "olist-mlops",
+  "receipts": [
+    {
+      "value": "172",
+      "label": "tests in CI",
+      "context": "Olist MLOps",
+      "href": "#olist-mlops"
+    },
+    {
+      "value": "220",
+      "label": "backend tests passing",
+      "context": "EduSmartAI branch",
+      "href": "#edusmartai"
+    },
+    {
+      "value": "1,103",
+      "label": "duplicate rows found",
+      "context": "Vehicle CO2 re-evaluation",
+      "href": "#check-co2"
+    },
+    {
+      "value": "26",
+      "label": "tests, with abstention",
+      "context": "RAG Document Search",
+      "href": "#more-work"
+    }
+  ],
+  "visuals": {
+    "co2": {
+      "id": "check-co2",
+      "title": "Vehicle CO2: the same model, scored more strictly",
+      "lead": "The notebook reported R² 0.9972. 1,103 of its 7,385 rows are exact duplicates, so some test rows had a copy in training. Select a step to see what changed.",
+      "unit": "g/km",
+      "steps": [
+        {
+          "name": "Notebook split, duplicates kept",
+          "r2": "0.9972",
+          "rmse": 3.03,
+          "note": "The original result, reproduced. 246 of the 1,477 test rows have an identical copy in the training set."
+        },
+        {
+          "name": "Duplicates removed, same split",
+          "r2": "0.9968",
+          "rmse": 3.52,
+          "note": "Removing duplicates first raises the typical error by about half a gram per kilometre."
+        },
+        {
+          "name": "Whole vehicle models held out",
+          "r2": "0.9948",
+          "rmse": 4.04,
+          "note": "Five-fold GroupKFold by make and model: the model never sees the vehicle it is scored on. This is the honest figure."
+        },
+        {
+          "name": "Baseline: one straight line",
+          "r2": "0.9902",
+          "rmse": 5.82,
+          "note": "A straight line on fuel consumption and fuel type. The model beats it, by less than the first score suggested.",
+          "baseline": true
+        }
+      ],
+      "takeaway": "R² barely moves, from 0.9972 to 0.9948. The typical error grows by a third, from 3.03 to 4.04 g/km, and stays below the baseline's 5.82.",
+      "source_label": "Repository README, re-evaluation table",
+      "source_url": "https://github.com/tahamohmadf19-dev/vehicle-co2-emissions-prediction#re-evaluation-without-leakage"
+    },
+    "early": {
+      "id": "check-early",
+      "title": "EduSmartAI: how early can risk be predicted?",
+      "lead": "Models retrained from my branch on 2026-11-07, one per cut-off day. Each uses only course activity known by that day. Select a day.",
+      "days": [
+        {
+          "day": 14,
+          "auc": 0.5657,
+          "accuracy": "0.5536",
+          "note": "Close to chance. Reported as insufficient for use instead of being tuned until it looked better."
+        },
+        {
+          "day": 28,
+          "auc": 0.6769,
+          "accuracy": "0.6444",
+          "note": "A usable signal appears, still weak for decisions about a single student."
+        },
+        {
+          "day": 42,
+          "auc": 0.7288,
+          "accuracy": "0.6844",
+          "note": "The strongest of the three. A screening aid for advisers, not an automatic decision."
+        }
+      ],
+      "chance": 0.5,
+      "takeaway": "An earlier score of 0.979 relied on data known only after a course ended, so it is not a valid early warning and is not plotted.",
+      "source_label": "EduSmartAI case study",
+      "source_url": "case-studies/edusmartai.html"
+    },
+    "olist": {
+      "id": "check-olist",
+      "title": "Olist MLOps: the model against chance",
+      "lead": "Late deliveries are 4.28% of test orders. A model that guesses at random scores about that rate on PR-AUC, and 0.5 on ROC-AUC.",
+      "metrics": [
+        {
+          "name": "ROC-AUC",
+          "model": 0.6115,
+          "chance": 0.5,
+          "chance_label": "chance",
+          "max": 1.0
+        },
+        {
+          "name": "PR-AUC",
+          "model": 0.067,
+          "chance": 0.0428,
+          "chance_label": "random, at the late rate",
+          "max": 0.1
+        }
+      ],
+      "takeaway": "Better than chance, and weak. The project's value is the tested, monitored service around the model, and the page says so.",
+      "source_label": "Olist MLOps case study",
+      "source_url": "case-studies/olist-mlops.html"
+    }
+  }
 }

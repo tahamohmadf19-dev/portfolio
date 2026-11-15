@@ -142,15 +142,23 @@ def test_no_phone_number_on_the_page():
     assert not re.search(r"\+?962[\s\d-]{6,}|07[789]\d{7}", HTML)
 
 
-def test_the_linked_resume_exists():
-    if not DATA["person"]["cv_url"]:
+CVS = DATA["person"].get("cv_downloads", [])
+
+
+def test_the_linked_resumes_exist():
+    if not CVS:
         pytest.skip("No resume is published in this release.")
-    cv = ROOT / DATA["person"]["cv_url"]
-    assert cv.exists() and cv.suffix == ".pdf" and cv.stat().st_size < 300_000
+    assert {cv["label"] for cv in CVS} == {"AI Engineer", "ML & MLOps Engineer"}
+    for cv in CVS:
+        path = ROOT / cv["url"]
+        assert path.exists() and path.suffix == ".pdf" and path.stat().st_size < 300_000
+        assert f'href="{cv["url"]}" download' in HTML
+    tracked = subprocess.run(["git", "ls-files", "*.pdf"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
+    assert set(tracked) <= {cv["url"] for cv in CVS}, "only the approved resume files are published"
 
 
 def test_without_an_approved_resume_no_pdf_is_published_or_linked():
-    if DATA["person"]["cv_url"]:
+    if CVS:
         pytest.skip("A resume is published.")
     tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
     assert not [f for f in tracked if f.lower().endswith(".pdf")]
@@ -182,7 +190,10 @@ def test_hero_has_identity_photo_and_actions():
     assert "<h1" in hero and "Mohammad" in hero and "Alhmad" in hero
     assert 'alt="Portrait of Mohammad Taha Alhmad"' in hero or 'class="frame-empty"' in hero
     assert 'href="#work"' in hero and "mailto:" in hero
-    assert (DATA["person"]["cv_url"] in hero) if DATA["person"]["cv_url"] else ("download" not in hero)
+    if CVS:
+        assert all(cv["url"] in hero for cv in CVS)
+    else:
+        assert "download" not in hero
 
 
 def test_accuracy_is_not_a_homepage_headline():
@@ -529,3 +540,42 @@ def test_page_shows_confirmed_facts_only():
     green = next(job for job in DATA["experience"] if job["org"] == "Green Circle for Cybersecurity")
     assert (green["role"], green["dates"]) == ("AI Engineering Intern", "2026")
     assert any("Green Circle: exact start and end months" in item for item in [*DATA["unconfirmed"], *DATA.get("resolved_for_release", {})])
+
+
+VISUALS = DATA.get("visuals", {})
+
+
+def test_early_warning_figures_match_the_case_study():
+    case = re.sub(r"<[^>]+>", " ", CASE_PAGES["edusmartai"])
+    for day in VISUALS["early"]["days"]:
+        assert f'day {day["day"]}, {day["auc"]:.4f}' in case.replace("Day", "day")
+        assert f'day {day["day"]}, {day["accuracy"]}' in case.replace("Day", "day")
+    assert "0.979" not in re.search(r'<svg viewBox.*?</svg>', HTML, re.DOTALL).group(0), "the leaked score is never plotted"
+
+
+def test_olist_meters_match_the_project_evidence():
+    project = next(p for p in DATA["projects"] if p["id"] == "olist-mlops")
+    evidence = " ".join(item["text"] for item in project["evidence"]) + " " + project["status"]
+    roc, pr = VISUALS["olist"]["metrics"]
+    assert f'ROC-AUC {roc["model"]:.4f}' in evidence and f'PR-AUC {pr["model"]:.4f}' in evidence
+    assert f'{pr["chance"] * 100:.2f}% late rate' in evidence
+
+
+def test_co2_ladder_is_ordered_and_sourced():
+    steps = VISUALS["co2"]["steps"]
+    assert [s["rmse"] for s in steps] == sorted(s["rmse"] for s in steps), "each stricter check can only add error"
+    assert steps[0]["r2"] == "0.9972" and steps[-1].get("baseline")
+    assert "vehicle-co2-emissions-prediction" in VISUALS["co2"]["source_url"]
+
+
+def test_receipts_are_backed_by_the_page():
+    text = re.sub(r"<[^>]+>", " ", HTML)
+    for receipt in DATA["receipts"]:
+        assert receipt["href"].lstrip("#") in re.findall(r'id="([^"]+)"', HTML)
+    assert "172 tests" in text and "220 passed" in text and "26 tests" in text and "1,103" in text
+
+
+def test_mlops_training_is_not_called_a_certificate():
+    cert = next(c for c in DATA["education"]["certificates"] if c["name"] == "MLOps Training")
+    assert cert["issuer"] == "Qafza Tech" and cert["url"] is None
+    assert "certif" not in (cert["note"] or "").lower()
