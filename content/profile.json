@@ -582,7 +582,7 @@
   "contact_form": {
     "provider": "Web3Forms",
     "endpoint": "https://api.web3forms.com/submit",
-    "access_key": "",
+    "access_key": "d682caff-c955-47a0-86f6-16b1df7e6dc9",
     "access_key_note": "Public by design (Web3Forms docs). Created by the owner at web3forms.com with the contact email; the strict build refuses an empty key.",
     "privacy_url": "https://web3forms.com/privacy",
     "inquiry_types": [
